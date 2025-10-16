@@ -13,7 +13,22 @@ return new class extends Migration
     {
         Schema::create('complaints', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
+            $table->date('date');
+            $table->date('product_arrival_date');
+            $table->string('product_name');
+            $table->string('production_code');
+            $table->date('best_before');
+            $table->integer('complaint_amount');
+            $table->text('nonconformity_type');
+            $table->string('ncr');
+            $table->string('complaint_documentation');
+            $table->string('customer');
+            $table->uuid('plant_uuid');
+            $table->string('delivery');
             $table->timestamps();
+
+            $table->foreign('plant_uuid')->references('uuid')->on('plants')->nullOnDelete();
         });
     }
 

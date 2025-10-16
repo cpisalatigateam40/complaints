@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('root_causes', function (Blueprint $table) {
             $table->id();
+            $table->string('root_cause_name');
             $table->timestamps();
         });
     }

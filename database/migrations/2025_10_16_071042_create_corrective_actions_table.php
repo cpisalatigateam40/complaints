@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('corrective_actions', function (Blueprint $table) {
             $table->id();
+            $table->longText('short_term_ca');
+            $table->longText('long_term_ca');
+            $table->string('status');
+            $table->longText('causative factor');
             $table->timestamps();
         });
     }
