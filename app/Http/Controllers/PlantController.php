@@ -141,27 +141,20 @@ class PlantController extends Controller
     public function synchronizePlant($uuid)
     {
         $plant = Plant::firstWhere('uuid', $uuid);
-        $project = Project::all();
 
         return view('plant.synchronize', [
             'plant' => $plant,
-            'projects' => $project
         ]);
     }
 
     public function synchronize(Request $request, $uuid)
     {
-        $request->validate([
-            'project_uuid.*' => 'required|uuid|exists:projects,uuid'
-        ]);
 
         $syncMessages = [];
 
         foreach ($request->project_uuid as $project_uuid) {
             $plant = Plant::with('realDepartments')->firstWhere('uuid', $uuid);
-            $project = Project::firstWhere('uuid', $project_uuid);
             $data = [
-                'projectUrl' => $project->url . '/api/plant-sync',
                 'plant' => [
                     'uuid' => $plant->uuid,
                     'plant' => $plant->plant,
@@ -180,7 +173,6 @@ class PlantController extends Controller
 
             if (($result['status'] ?? 'error') === 'success') {
                 $syncMessages[] = [
-                    'project' => $project->name,
                     'status' => $result['status'] ?? 'error',
                     'message' => $result['message'] ?? 'Unknown Error'
                 ];

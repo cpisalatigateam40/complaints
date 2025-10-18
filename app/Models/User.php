@@ -6,11 +6,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Facades\Auth;
+use App\Notifications\CustomVerifyEmail;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use  HasFactory, Notifiable,  HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -18,9 +21,12 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'uuid',
+        'username',
         'name',
         'email',
         'password',
+        'department_uuid'
     ];
 
     /**
@@ -44,5 +50,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(DepartmentPlant::class, 'department_uuid', 'uuid');
     }
 }

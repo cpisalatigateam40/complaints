@@ -19,6 +19,8 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/plants/{uuid}/synchronize-plant', [PlantController::class, 'synchronizePlant'])->name('plants.synchronize-plant');
+    Route::post('/plants/{uuid}/synchronize', [PlantController::class, 'synchronize'])->name('plants.synchronize');
     //plant
     Route::get('/plants/{uuid}/manage-department', [PlantController::class, 'manageDepartment'])->name('plants.manage-department');
     Route::put('/plants/{uuid}/update-manage-department', [PlantController::class, 'updateManageDepartment'])->name('plants.update-manage-department');
