@@ -37,18 +37,7 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'can access plants']);
         Permission::create(['name' => 'can create plants']);
         Permission::create(['name' => 'can edit plants']);
-        Permission::create(['name' => 'can edit users']);
         Permission::create(['name' => 'can delete plants']);
-        Permission::create(['name' => 'can access role projects']);
-        Permission::create(['name' => 'can add project roles']);
-        Permission::create(['name' => 'can edit role projects']);
-        Permission::create(['name' => 'can edit departments']);
-        Permission::create(['name' => 'can delete role projects']);
-        Permission::create(['name' => 'can access projects']);
-        Permission::create(['name' => 'can create projects']);
-        Permission::create(['name' => 'can edit projects']);
-        Permission::create(['name' => 'can delete projects']);
-        Permission::create(['name' => 'can desync users']);
 
         $roleSuperadmin = Role::create(['name' => 'Superadmin']);
         $roleAdmin = Role::create(['name' => 'Admin']);

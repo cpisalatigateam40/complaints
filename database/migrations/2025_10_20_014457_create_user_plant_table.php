@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('root_causes', function (Blueprint $table) {
+        Schema::create('user_plants', function (Blueprint $table) {
             $table->id();
-            $table->string('root_cause_name');
-            $table->uuid('complaint_uuid');
+            $table->uuid('user_uuid');
+            $table->uuid('plant_uuid');
             $table->timestamps();
 
-            $table->foreign('complaint_uuid')->references('uuid')->on('complaints');
+            $table->foreign('user_uuid')->references('uuid')->on('users');
+            $table->foreign('plant_uuid')->references('uuid')->on('plants');
         });
     }
 
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('root_causes');
+        Schema::dropIfExists('user_plants');
     }
 };

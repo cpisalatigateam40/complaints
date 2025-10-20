@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->longText('short_term_ca');
             $table->longText('long_term_ca');
-            $table->string('status');
-            $table->longText('causative factor');
+            $table->longText('causative_factor');
+            $table->uuid('complaint_uuid');
             $table->timestamps();
+
+            $table->foreign('complaint_uuid')->references('uuid')->on('complaints');
         });
     }
 

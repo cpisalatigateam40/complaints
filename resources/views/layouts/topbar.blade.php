@@ -41,8 +41,8 @@
                 <!-- User Info -->
                 <div class="flex items-center space-x-3">
                     <div class="text-right">
-                        <p class="text-sm font-medium text-gray-800" id="userFullName">-</p>
-                        <p class="text-xs text-gray-500" id="userRole">-</p>
+                        <p class="text-sm font-medium text-gray-800" id="userFullName">{{Auth::user()->name}}</p>
+                        <p class="text-xs text-gray-500" id="userRole">{{Auth::user()->role->role ?? '-'}}</p>
                     </div>
                     <div
                         class="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-700 rounded-full flex items-center justify-center">
@@ -79,7 +79,7 @@
                     <span>Dashboard</span>
                 </a>
 
-                <a href="#"
+                <a href="{{ route('complaints.index') }}"
                     class="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200
     {{ request()->is('complaints*') ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100' }}">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,171 +189,171 @@
 
 @section('script')
 <script>
-let complaints = [];
-let editingIndex = -1;
-let currentUser = null;
-let editingUserIndex = -1;
-let selectedBranches = ['all']; // Default: semua cabang
+    let complaints = [];
+    let editingIndex = -1;
+    let currentUser = null;
+    let editingUserIndex = -1;
+    let selectedBranches = ['all']; // Default: semua cabang
 
-const branches = [{
-        id: 'salatiga',
-        name: 'Salatiga'
-    },
-    {
-        id: 'sragen',
-        name: 'Sragen'
-    },
-    {
-        id: 'banyumas',
-        name: 'Banyumas'
-    },
-    {
-        id: 'pemalang',
-        name: 'Pemalang'
-    },
-    {
-        id: 'kebumen',
-        name: 'Kebumen'
-    },
-    {
-        id: 'banjarbaru',
-        name: 'Banjarbaru'
-    },
-    {
-        id: 'balikpapan',
-        name: 'Balikpapan'
-    }
-];
-
-function openBranchModal() {
-    const modal = document.getElementById('branchModal');
-    modal.classList.remove('hidden');
-    // Add animation
-    setTimeout(() => {
-        modal.querySelector('.bg-white').classList.remove('scale-95');
-        modal.querySelector('.bg-white').classList.add('scale-100');
-    }, 10);
-}
-
-function closeBranchModal() {
-    const modal = document.getElementById('branchModal');
-    modal.querySelector('.bg-white').classList.remove('scale-100');
-    modal.querySelector('.bg-white').classList.add('scale-95');
-    setTimeout(() => {
-        modal.classList.add('hidden');
-    }, 200);
-}
-
-function resetBranchFilter() {
-    selectedBranches = ['all'];
-    document.getElementById('branchAll').checked = true;
-    branches.forEach(branch => {
-        document.getElementById(`branch_${branch.id}`).checked = false;
-    });
-    updateSelectedBranchCount();
-}
-
-function handleBranchSelection(branchId) {
-    if (branchId === 'all') {
-        const allCheckbox = document.getElementById('branchAll');
-        const individualCheckboxes = branches.map(b => document.getElementById(`branch_${b.id}`));
-
-        if (allCheckbox.checked) {
-            // Select all
-            selectedBranches = ['all'];
-            individualCheckboxes.forEach(cb => cb.checked = false);
-        } else {
-            // Deselect all
-            selectedBranches = [];
+    const branches = [{
+            id: 'salatiga',
+            name: 'Salatiga'
+        },
+        {
+            id: 'sragen',
+            name: 'Sragen'
+        },
+        {
+            id: 'banyumas',
+            name: 'Banyumas'
+        },
+        {
+            id: 'pemalang',
+            name: 'Pemalang'
+        },
+        {
+            id: 'kebumen',
+            name: 'Kebumen'
+        },
+        {
+            id: 'banjarbaru',
+            name: 'Banjarbaru'
+        },
+        {
+            id: 'balikpapan',
+            name: 'Balikpapan'
         }
-    } else {
-        const branchCheckbox = document.getElementById(`branch_${branchId}`);
-        const allCheckbox = document.getElementById('branchAll');
+    ];
 
-        if (branchCheckbox.checked) {
-            // Add branch to selection
-            if (selectedBranches.includes('all')) {
-                selectedBranches = [branchId];
-                allCheckbox.checked = false;
-            } else {
-                selectedBranches.push(branchId);
-            }
-        } else {
-            // Remove branch from selection
-            selectedBranches = selectedBranches.filter(id => id !== branchId);
-            allCheckbox.checked = false;
-        }
-
-        // If all individual branches are selected, check "all"
-        const allIndividualSelected = branches.every(b =>
-            document.getElementById(`branch_${b.id}`).checked
-        );
-
-        if (allIndividualSelected) {
-            selectedBranches = ['all'];
-            allCheckbox.checked = true;
-            branches.forEach(b => {
-                document.getElementById(`branch_${b.id}`).checked = false;
-            });
-        }
+    function openBranchModal() {
+        const modal = document.getElementById('branchModal');
+        modal.classList.remove('hidden');
+        // Add animation
+        setTimeout(() => {
+            modal.querySelector('.bg-white').classList.remove('scale-95');
+            modal.querySelector('.bg-white').classList.add('scale-100');
+        }, 10);
     }
 
-    updateSelectedBranchCount();
-}
-
-function updateSelectedBranchCount() {
-    const countElement = document.getElementById('selectedBranchCount');
-    if (selectedBranches.includes('all')) {
-        countElement.textContent = '7 cabang dipilih';
-    } else {
-        countElement.textContent = `${selectedBranches.length} cabang dipilih`;
+    function closeBranchModal() {
+        const modal = document.getElementById('branchModal');
+        modal.querySelector('.bg-white').classList.remove('scale-100');
+        modal.querySelector('.bg-white').classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 200);
     }
-}
 
-function applyBranchFilter() {
-    // Ensure at least one branch is selected
-    if (selectedBranches.length === 0) {
+    function resetBranchFilter() {
         selectedBranches = ['all'];
         document.getElementById('branchAll').checked = true;
+        branches.forEach(branch => {
+            document.getElementById(`branch_${branch.id}`).checked = false;
+        });
+        updateSelectedBranchCount();
     }
 
-    updateBranchFilterText();
-    closeBranchModal();
+    function handleBranchSelection(branchId) {
+        if (branchId === 'all') {
+            const allCheckbox = document.getElementById('branchAll');
+            const individualCheckboxes = branches.map(b => document.getElementById(`branch_${b.id}`));
 
-    // Refresh current page data
-    const currentPage = getCurrentPage();
-    if (currentPage === 'dashboard') {
-        updateDashboard();
-    } else if (currentPage === 'complaints') {
-        updateComplaintsTable();
-    } else if (currentPage === 'users') {
-        updateUsersTable();
-        updateUserStats();
+            if (allCheckbox.checked) {
+                // Select all
+                selectedBranches = ['all'];
+                individualCheckboxes.forEach(cb => cb.checked = false);
+            } else {
+                // Deselect all
+                selectedBranches = [];
+            }
+        } else {
+            const branchCheckbox = document.getElementById(`branch_${branchId}`);
+            const allCheckbox = document.getElementById('branchAll');
+
+            if (branchCheckbox.checked) {
+                // Add branch to selection
+                if (selectedBranches.includes('all')) {
+                    selectedBranches = [branchId];
+                    allCheckbox.checked = false;
+                } else {
+                    selectedBranches.push(branchId);
+                }
+            } else {
+                // Remove branch from selection
+                selectedBranches = selectedBranches.filter(id => id !== branchId);
+                allCheckbox.checked = false;
+            }
+
+            // If all individual branches are selected, check "all"
+            const allIndividualSelected = branches.every(b =>
+                document.getElementById(`branch_${b.id}`).checked
+            );
+
+            if (allIndividualSelected) {
+                selectedBranches = ['all'];
+                allCheckbox.checked = true;
+                branches.forEach(b => {
+                    document.getElementById(`branch_${b.id}`).checked = false;
+                });
+            }
+        }
+
+        updateSelectedBranchCount();
     }
-}
 
-function updateBranchFilterText() {
-    const textElement = document.getElementById('branchFilterText');
-    if (selectedBranches.includes('all')) {
-        textElement.textContent = 'Semua Cabang';
-    } else if (selectedBranches.length === 1) {
-        const branchName = branches.find(b => b.id === selectedBranches[0])?.name;
-        textElement.textContent = branchName || 'Pilih Cabang';
-    } else if (selectedBranches.length <= 3) {
-        const branchNames = selectedBranches.map(id =>
-            branches.find(b => b.id === id)?.name
-        ).join(', ');
-        textElement.textContent = branchNames;
-    } else {
-        textElement.textContent = `${selectedBranches.length} Cabang Dipilih`;
+    function updateSelectedBranchCount() {
+        const countElement = document.getElementById('selectedBranchCount');
+        if (selectedBranches.includes('all')) {
+            countElement.textContent = '7 cabang dipilih';
+        } else {
+            countElement.textContent = `${selectedBranches.length} cabang dipilih`;
+        }
     }
-}
 
-function logout() {
-    // Create custom confirmation modal
-    const confirmModal = document.createElement('div');
-    confirmModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-    confirmModal.innerHTML = `
+    function applyBranchFilter() {
+        // Ensure at least one branch is selected
+        if (selectedBranches.length === 0) {
+            selectedBranches = ['all'];
+            document.getElementById('branchAll').checked = true;
+        }
+
+        updateBranchFilterText();
+        closeBranchModal();
+
+        // Refresh current page data
+        const currentPage = getCurrentPage();
+        if (currentPage === 'dashboard') {
+            updateDashboard();
+        } else if (currentPage === 'complaints') {
+            updateComplaintsTable();
+        } else if (currentPage === 'users') {
+            updateUsersTable();
+            updateUserStats();
+        }
+    }
+
+    function updateBranchFilterText() {
+        const textElement = document.getElementById('branchFilterText');
+        if (selectedBranches.includes('all')) {
+            textElement.textContent = 'Semua Cabang';
+        } else if (selectedBranches.length === 1) {
+            const branchName = branches.find(b => b.id === selectedBranches[0])?.name;
+            textElement.textContent = branchName || 'Pilih Cabang';
+        } else if (selectedBranches.length <= 3) {
+            const branchNames = selectedBranches.map(id =>
+                branches.find(b => b.id === id)?.name
+            ).join(', ');
+            textElement.textContent = branchNames;
+        } else {
+            textElement.textContent = `${selectedBranches.length} Cabang Dipilih`;
+        }
+    }
+
+    function logout() {
+        // Create custom confirmation modal
+        const confirmModal = document.createElement('div');
+        confirmModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        confirmModal.innerHTML = `
 <div class="bg-white rounded-lg p-6 max-w-md mx-4">
 <h3 class="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Logout</h3>
 <p class="text-gray-600 mb-6">Apakah Anda yakin ingin keluar dari sistem?</p>
@@ -370,16 +370,16 @@ function logout() {
 </div>
 </div>
             `;
-    document.body.appendChild(confirmModal);
-}
+        document.body.appendChild(confirmModal);
+    }
 
-function confirmLogout() {
-    currentUser = null;
-    localStorage.removeItem('currentUser');
-    showLoginPage();
-    // Reset form
-    document.getElementById('loginForm').reset();
-    document.getElementById('loginError').classList.add('hidden');
-}
+    function confirmLogout() {
+        currentUser = null;
+        localStorage.removeItem('currentUser');
+        showLoginPage();
+        // Reset form
+        document.getElementById('loginForm').reset();
+        document.getElementById('loginError').classList.add('hidden');
+    }
 </script>
 @endsection

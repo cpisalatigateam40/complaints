@@ -160,15 +160,25 @@
 
                     {{-- Status --}}
                     <td class="px-4 py-3">
+                        @if($user->status == 1)
                         <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
                             Aktif
                         </span>
+                        @else
+                        <span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">
+                            Inktif
+                        </span>
+                        @endif
                     </td>
 
                     {{-- Aksi --}}
                     <td class="px-4 py-3 text-center space-x-2">
                         <a href="{{ route('users.edit', $user->uuid) }}" class="text-blue-600 hover:underline">Edit</a>
-                        <button class="text-yellow-600 hover:underline">Nonaktifkan</button>
+                        @if($user->status == 1)
+                        <a href="{{ route('users.update-status', $user->uuid) }}" class="text-yellow-600 hover:underline">Nonaktif</a>
+                        @else
+                        <a href="{{ route('users.update-status', $user->uuid) }}" class="text-yellow-600 hover:underline">Aktifkan</a>
+                        @endif
                         <form action="{{ route('users.destroy', $user->uuid) }}" method="POST" class="inline">
                             @csrf
                             @method('DELETE')

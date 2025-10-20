@@ -25,7 +25,22 @@ class UserSeeder extends Seeder
             'email' => 'superadmin@cp.co.id',
             'email_verified_at' => now(),
             'password' => bcrypt('cpi12345'),
-            'department_uuid' => $department->uuid
+            'department_uuid' => $department->uuid,
+            'status' => 1
         ]);
+
+        $user2 = User::create([
+            'uuid' => Str::uuid(),
+            'username' => 'yosi.pratama',
+            'name' => 'Yosi Pratama',
+            'email' => 'yosi.pratama@cp.co.id',
+            'email_verified_at' => now(),
+            'password' => bcrypt('cpi12345'),
+            'department_uuid' => $department->uuid,
+            'status' => 1
+        ]);
+
+        $user1->syncRoles('Superadmin');
+        $user2->syncRoles('Superadmin');
     }
 }

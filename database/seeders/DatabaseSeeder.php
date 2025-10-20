@@ -19,7 +19,9 @@ class DatabaseSeeder extends Seeder
             PlantSeeder::class,
             DepartmentSeeder::class,
             DepartmentPlantSeeder::class,
+            RoleSeeder::class,
             UserSeeder::class,
+            ProductSeeder::class,
         ]);
     }
 }

@@ -31,4 +31,14 @@ class Plant extends Model
             'department_uuid'    // Local on department_plants
         )->where('department_plants.visible', true);
     }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'plant_uuid', 'uuid');
+    }
+
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class, 'plant_uuid', 'uuid');
+    }
 }

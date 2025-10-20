@@ -107,4 +107,21 @@ class UserController extends Controller
     {
         //
     }
+
+    public function updateStatus($uuid)
+    {
+        $user = User::firstWhere('uuid', $uuid);
+
+        if ($user->status = 1) {
+            $user->update([
+                'status' => 0
+            ]);
+        } elseif ($user->status = 0) {
+            $user->update([
+                'status' => 1
+            ]);
+        }
+
+        return redirect()->route('users.index')->with('success', 'Status user berhasil diupdate');
+    }
 }

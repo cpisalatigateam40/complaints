@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\PermissionController;
@@ -19,15 +20,19 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+    //users
+    Route::get('/users/{uuid}/update-status', [UserController::class, 'updateStatus'])->name('users.update-status');
+    //plants
     Route::get('/plants/{uuid}/synchronize-plant', [PlantController::class, 'synchronizePlant'])->name('plants.synchronize-plant');
     Route::post('/plants/{uuid}/synchronize', [PlantController::class, 'synchronize'])->name('plants.synchronize');
-    //plant
     Route::get('/plants/{uuid}/manage-department', [PlantController::class, 'manageDepartment'])->name('plants.manage-department');
     Route::put('/plants/{uuid}/update-manage-department', [PlantController::class, 'updateManageDepartment'])->name('plants.update-manage-department');
+    //resources
     Route::resource('/dashboard', DashboardController::class)->except(['show']);
     Route::resource('/departments', DepartmentController::class)->except(['show']);
     Route::resource('/plants', PlantController::class)->except(['show']);
     Route::resource('/users', UserController::class)->except(['show']);
+    Route::resource('/complaints', ComplaintController::class)->except(['show']);
     Route::prefix('roles')
         ->name('roles.')
         ->controller(RoleController::class)

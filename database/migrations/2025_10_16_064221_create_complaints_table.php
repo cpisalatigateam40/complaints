@@ -16,7 +16,7 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->date('date');
             $table->date('product_arrival_date');
-            $table->string('product_name');
+            $table->uuid('product_uuid')->nullable();
             $table->string('production_code');
             $table->date('best_before');
             $table->integer('complaint_amount');
@@ -26,9 +26,11 @@ return new class extends Migration
             $table->string('customer');
             $table->uuid('plant_uuid');
             $table->string('delivery');
+            $table->integer('status');
             $table->timestamps();
 
-            $table->foreign('plant_uuid')->references('uuid')->on('plants')->nullOnDelete();
+            $table->foreign('product_uuid')->references('uuid')->on('products');
+            $table->foreign('plant_uuid')->references('uuid')->on('plants');
         });
     }
 
