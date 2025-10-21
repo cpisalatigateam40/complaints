@@ -15,7 +15,7 @@ class Complaint extends Model
     protected $fillable = [
         'date',
         'product_arrival_date',
-        'product_uuid',
+        'product_name',
         'production_code',
         'best_before',
         'complaint_amount',
@@ -28,10 +28,11 @@ class Complaint extends Model
         'status'
     ];
 
-    public function product()
-    {
-        return $this->belongsTo(Product::class, 'product_uuid', 'uuid');
-    }
+    protected $casts = [
+        'date' => 'date',
+        'product_arrival_date' => 'date',
+        'best_before' => 'date',
+    ];
 
     public function plant()
     {

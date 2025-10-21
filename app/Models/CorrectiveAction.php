@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CorrectiveAction extends Model
 {
-    use HasFactory, HasUuid;
+    use HasFactory;
 
     protected $table = "corrective_actions";
     protected $primaryKey = "id";

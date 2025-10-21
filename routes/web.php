@@ -33,6 +33,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/plants', PlantController::class)->except(['show']);
     Route::resource('/users', UserController::class)->except(['show']);
     Route::resource('/complaints', ComplaintController::class)->except(['show']);
+    Route::get('/complaints/{uuid}', [ComplaintController::class, 'show'])->name('complaints.show');
+
+
+
     Route::prefix('roles')
         ->name('roles.')
         ->controller(RoleController::class)

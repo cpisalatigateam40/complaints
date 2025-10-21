@@ -101,6 +101,17 @@
                     <span>Manajemen User</span>
                 </a>
 
+                <a href="{{ route('plants.index') }}"
+                    class="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200
+    {{ request()->is('plants*') ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100' }}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
+                        </path>
+                    </svg>
+                    <span>Plant</span>
+                </a>
+
                 <a href="{{ route('departments.index') }}"
                     class="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200
     {{ request()->is('departments*') ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100' }}">
@@ -112,16 +123,7 @@
                     <span>Department</span>
                 </a>
 
-                <a href="{{ route('plants.index') }}"
-                    class="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200
-    {{ request()->is('plants*') ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100' }}">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
-                        </path>
-                    </svg>
-                    <span>Plant</span>
-                </a>
+
 
             </div>
         </div>
@@ -189,171 +191,171 @@
 
 @section('script')
 <script>
-    let complaints = [];
-    let editingIndex = -1;
-    let currentUser = null;
-    let editingUserIndex = -1;
-    let selectedBranches = ['all']; // Default: semua cabang
+let complaints = [];
+let editingIndex = -1;
+let currentUser = null;
+let editingUserIndex = -1;
+let selectedBranches = ['all']; // Default: semua cabang
 
-    const branches = [{
-            id: 'salatiga',
-            name: 'Salatiga'
-        },
-        {
-            id: 'sragen',
-            name: 'Sragen'
-        },
-        {
-            id: 'banyumas',
-            name: 'Banyumas'
-        },
-        {
-            id: 'pemalang',
-            name: 'Pemalang'
-        },
-        {
-            id: 'kebumen',
-            name: 'Kebumen'
-        },
-        {
-            id: 'banjarbaru',
-            name: 'Banjarbaru'
-        },
-        {
-            id: 'balikpapan',
-            name: 'Balikpapan'
+const branches = [{
+        id: 'salatiga',
+        name: 'Salatiga'
+    },
+    {
+        id: 'sragen',
+        name: 'Sragen'
+    },
+    {
+        id: 'banyumas',
+        name: 'Banyumas'
+    },
+    {
+        id: 'pemalang',
+        name: 'Pemalang'
+    },
+    {
+        id: 'kebumen',
+        name: 'Kebumen'
+    },
+    {
+        id: 'banjarbaru',
+        name: 'Banjarbaru'
+    },
+    {
+        id: 'balikpapan',
+        name: 'Balikpapan'
+    }
+];
+
+function openBranchModal() {
+    const modal = document.getElementById('branchModal');
+    modal.classList.remove('hidden');
+    // Add animation
+    setTimeout(() => {
+        modal.querySelector('.bg-white').classList.remove('scale-95');
+        modal.querySelector('.bg-white').classList.add('scale-100');
+    }, 10);
+}
+
+function closeBranchModal() {
+    const modal = document.getElementById('branchModal');
+    modal.querySelector('.bg-white').classList.remove('scale-100');
+    modal.querySelector('.bg-white').classList.add('scale-95');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 200);
+}
+
+function resetBranchFilter() {
+    selectedBranches = ['all'];
+    document.getElementById('branchAll').checked = true;
+    branches.forEach(branch => {
+        document.getElementById(`branch_${branch.id}`).checked = false;
+    });
+    updateSelectedBranchCount();
+}
+
+function handleBranchSelection(branchId) {
+    if (branchId === 'all') {
+        const allCheckbox = document.getElementById('branchAll');
+        const individualCheckboxes = branches.map(b => document.getElementById(`branch_${b.id}`));
+
+        if (allCheckbox.checked) {
+            // Select all
+            selectedBranches = ['all'];
+            individualCheckboxes.forEach(cb => cb.checked = false);
+        } else {
+            // Deselect all
+            selectedBranches = [];
         }
-    ];
+    } else {
+        const branchCheckbox = document.getElementById(`branch_${branchId}`);
+        const allCheckbox = document.getElementById('branchAll');
 
-    function openBranchModal() {
-        const modal = document.getElementById('branchModal');
-        modal.classList.remove('hidden');
-        // Add animation
-        setTimeout(() => {
-            modal.querySelector('.bg-white').classList.remove('scale-95');
-            modal.querySelector('.bg-white').classList.add('scale-100');
-        }, 10);
+        if (branchCheckbox.checked) {
+            // Add branch to selection
+            if (selectedBranches.includes('all')) {
+                selectedBranches = [branchId];
+                allCheckbox.checked = false;
+            } else {
+                selectedBranches.push(branchId);
+            }
+        } else {
+            // Remove branch from selection
+            selectedBranches = selectedBranches.filter(id => id !== branchId);
+            allCheckbox.checked = false;
+        }
+
+        // If all individual branches are selected, check "all"
+        const allIndividualSelected = branches.every(b =>
+            document.getElementById(`branch_${b.id}`).checked
+        );
+
+        if (allIndividualSelected) {
+            selectedBranches = ['all'];
+            allCheckbox.checked = true;
+            branches.forEach(b => {
+                document.getElementById(`branch_${b.id}`).checked = false;
+            });
+        }
     }
 
-    function closeBranchModal() {
-        const modal = document.getElementById('branchModal');
-        modal.querySelector('.bg-white').classList.remove('scale-100');
-        modal.querySelector('.bg-white').classList.add('scale-95');
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 200);
-    }
+    updateSelectedBranchCount();
+}
 
-    function resetBranchFilter() {
+function updateSelectedBranchCount() {
+    const countElement = document.getElementById('selectedBranchCount');
+    if (selectedBranches.includes('all')) {
+        countElement.textContent = '7 cabang dipilih';
+    } else {
+        countElement.textContent = `${selectedBranches.length} cabang dipilih`;
+    }
+}
+
+function applyBranchFilter() {
+    // Ensure at least one branch is selected
+    if (selectedBranches.length === 0) {
         selectedBranches = ['all'];
         document.getElementById('branchAll').checked = true;
-        branches.forEach(branch => {
-            document.getElementById(`branch_${branch.id}`).checked = false;
-        });
-        updateSelectedBranchCount();
     }
 
-    function handleBranchSelection(branchId) {
-        if (branchId === 'all') {
-            const allCheckbox = document.getElementById('branchAll');
-            const individualCheckboxes = branches.map(b => document.getElementById(`branch_${b.id}`));
+    updateBranchFilterText();
+    closeBranchModal();
 
-            if (allCheckbox.checked) {
-                // Select all
-                selectedBranches = ['all'];
-                individualCheckboxes.forEach(cb => cb.checked = false);
-            } else {
-                // Deselect all
-                selectedBranches = [];
-            }
-        } else {
-            const branchCheckbox = document.getElementById(`branch_${branchId}`);
-            const allCheckbox = document.getElementById('branchAll');
-
-            if (branchCheckbox.checked) {
-                // Add branch to selection
-                if (selectedBranches.includes('all')) {
-                    selectedBranches = [branchId];
-                    allCheckbox.checked = false;
-                } else {
-                    selectedBranches.push(branchId);
-                }
-            } else {
-                // Remove branch from selection
-                selectedBranches = selectedBranches.filter(id => id !== branchId);
-                allCheckbox.checked = false;
-            }
-
-            // If all individual branches are selected, check "all"
-            const allIndividualSelected = branches.every(b =>
-                document.getElementById(`branch_${b.id}`).checked
-            );
-
-            if (allIndividualSelected) {
-                selectedBranches = ['all'];
-                allCheckbox.checked = true;
-                branches.forEach(b => {
-                    document.getElementById(`branch_${b.id}`).checked = false;
-                });
-            }
-        }
-
-        updateSelectedBranchCount();
+    // Refresh current page data
+    const currentPage = getCurrentPage();
+    if (currentPage === 'dashboard') {
+        updateDashboard();
+    } else if (currentPage === 'complaints') {
+        updateComplaintsTable();
+    } else if (currentPage === 'users') {
+        updateUsersTable();
+        updateUserStats();
     }
+}
 
-    function updateSelectedBranchCount() {
-        const countElement = document.getElementById('selectedBranchCount');
-        if (selectedBranches.includes('all')) {
-            countElement.textContent = '7 cabang dipilih';
-        } else {
-            countElement.textContent = `${selectedBranches.length} cabang dipilih`;
-        }
+function updateBranchFilterText() {
+    const textElement = document.getElementById('branchFilterText');
+    if (selectedBranches.includes('all')) {
+        textElement.textContent = 'Semua Cabang';
+    } else if (selectedBranches.length === 1) {
+        const branchName = branches.find(b => b.id === selectedBranches[0])?.name;
+        textElement.textContent = branchName || 'Pilih Cabang';
+    } else if (selectedBranches.length <= 3) {
+        const branchNames = selectedBranches.map(id =>
+            branches.find(b => b.id === id)?.name
+        ).join(', ');
+        textElement.textContent = branchNames;
+    } else {
+        textElement.textContent = `${selectedBranches.length} Cabang Dipilih`;
     }
+}
 
-    function applyBranchFilter() {
-        // Ensure at least one branch is selected
-        if (selectedBranches.length === 0) {
-            selectedBranches = ['all'];
-            document.getElementById('branchAll').checked = true;
-        }
-
-        updateBranchFilterText();
-        closeBranchModal();
-
-        // Refresh current page data
-        const currentPage = getCurrentPage();
-        if (currentPage === 'dashboard') {
-            updateDashboard();
-        } else if (currentPage === 'complaints') {
-            updateComplaintsTable();
-        } else if (currentPage === 'users') {
-            updateUsersTable();
-            updateUserStats();
-        }
-    }
-
-    function updateBranchFilterText() {
-        const textElement = document.getElementById('branchFilterText');
-        if (selectedBranches.includes('all')) {
-            textElement.textContent = 'Semua Cabang';
-        } else if (selectedBranches.length === 1) {
-            const branchName = branches.find(b => b.id === selectedBranches[0])?.name;
-            textElement.textContent = branchName || 'Pilih Cabang';
-        } else if (selectedBranches.length <= 3) {
-            const branchNames = selectedBranches.map(id =>
-                branches.find(b => b.id === id)?.name
-            ).join(', ');
-            textElement.textContent = branchNames;
-        } else {
-            textElement.textContent = `${selectedBranches.length} Cabang Dipilih`;
-        }
-    }
-
-    function logout() {
-        // Create custom confirmation modal
-        const confirmModal = document.createElement('div');
-        confirmModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-        confirmModal.innerHTML = `
+function logout() {
+    // Create custom confirmation modal
+    const confirmModal = document.createElement('div');
+    confirmModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    confirmModal.innerHTML = `
 <div class="bg-white rounded-lg p-6 max-w-md mx-4">
 <h3 class="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Logout</h3>
 <p class="text-gray-600 mb-6">Apakah Anda yakin ingin keluar dari sistem?</p>
@@ -370,16 +372,16 @@
 </div>
 </div>
             `;
-        document.body.appendChild(confirmModal);
-    }
+    document.body.appendChild(confirmModal);
+}
 
-    function confirmLogout() {
-        currentUser = null;
-        localStorage.removeItem('currentUser');
-        showLoginPage();
-        // Reset form
-        document.getElementById('loginForm').reset();
-        document.getElementById('loginError').classList.add('hidden');
-    }
+function confirmLogout() {
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    showLoginPage();
+    // Reset form
+    document.getElementById('loginForm').reset();
+    document.getElementById('loginError').classList.add('hidden');
+}
 </script>
 @endsection

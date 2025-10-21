@@ -22,11 +22,6 @@ class Product extends Model
         'shelf_life'
     ];
 
-    public function complaints()
-    {
-        return $this->hasMany(Complaint::class, 'product_uuid', 'uuid');
-    }
-
     public function plant()
     {
         return $this->belongsTo(Plant::class, 'plant_uuid', 'uuid');
