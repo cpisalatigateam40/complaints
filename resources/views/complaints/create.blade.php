@@ -226,28 +226,46 @@
 let allFiles = []; // menampung semua file yg dipilih
 
 function previewImages(event) {
-    const preview = document.getElementById('imagePreview');
     const files = Array.from(event.target.files);
-
-    // tambahkan file baru ke allFiles
     allFiles = allFiles.concat(files);
 
-    // reset preview
+    // reset input supaya bisa pilih file yang sama lagi
+    event.target.value = '';
+
+    renderPreview();
+}
+
+function renderPreview() {
+    const preview = document.getElementById('imagePreview');
     preview.innerHTML = '';
 
-    allFiles.forEach(file => {
+    allFiles.forEach((file, index) => {
         const reader = new FileReader();
         reader.onload = e => {
+            const container = document.createElement('div');
+            container.className = 'relative';
+
             const img = document.createElement('img');
             img.src = e.target.result;
             img.className = 'w-24 h-24 object-cover rounded border';
-            preview.appendChild(img);
+
+            // tombol hapus
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.innerHTML = '&times;';
+            btn.className =
+                'absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center';
+            btn.onclick = () => {
+                allFiles.splice(index, 1); // hapus file dari array
+                renderPreview(); // rerender preview
+            };
+
+            container.appendChild(img);
+            container.appendChild(btn);
+            preview.appendChild(container);
         }
         reader.readAsDataURL(file);
     });
-
-    // reset input supaya bisa pilih file yang sama lagi jika mau
-    event.target.value = '';
 }
 </script>
 @endsection
