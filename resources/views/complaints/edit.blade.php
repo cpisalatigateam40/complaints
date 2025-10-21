@@ -201,21 +201,21 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Faktor Penyebab</label>
                 <textarea name="causative_factor" rows="3"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">{{ old('causative_factor', $complaint->corrective_actions->causative_factor ?? '') }}</textarea>
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">{{ old('causative_factor', $complaint->corrective_action->causative_factor ?? '') }}</textarea>
             </div>
 
             <!-- Tindakan Perbaikan Jangka Pendek -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Tindakan Perbaikan Jangka Pendek</label>
                 <textarea name="short_term_ca" rows="3"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">{{ old('short_term_ca', $complaint->corrective_actions->short_term_ca ?? '') }}</textarea>
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">{{ old('short_term_ca', $complaint->corrective_action->short_term_ca ?? '') }}</textarea>
             </div>
 
             <!-- Tindakan Perbaikan Jangka Panjang -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Tindakan Perbaikan Jangka Panjang</label>
                 <textarea name="long_term_ca" rows="3"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">{{ old('long_term_ca', $complaint->corrective_actions->long_term_ca ?? '') }}</textarea>
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">{{ old('long_term_ca', $complaint->corrective_action->long_term_ca ?? '') }}</textarea>
             </div>
         </div>
 

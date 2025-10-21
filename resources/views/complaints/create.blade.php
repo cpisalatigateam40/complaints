@@ -171,39 +171,6 @@
             @enderror
         </div>
 
-        <!-- Faktor Penyebab -->
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Faktor Penyebab</label>
-            <textarea name="causative_factor"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                rows="3" required>{{ old('causative_factor') }}</textarea>
-            @error('causative_factor')
-            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <!-- Tindakan Perbaikan -->
-        <div class="mb-4 border-t pt-4">
-            <h4 class="font-medium text-gray-800 mb-2">Tindakan Perbaikan</h4>
-
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tindakan Perbaikan Jangka Pendek</label>
-            <textarea name="short_term_ca"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                rows="3" required>{{ old('short_term_ca') }}</textarea>
-            @error('short_term_ca')
-            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-            @enderror
-
-            <label class="block text-sm font-medium text-gray-700 mt-4 mb-1">Tindakan Perbaikan Jangka Panjang</label>
-            <textarea name="long_term_ca"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                rows="3" required>{{ old('long_term_ca') }}</textarea>
-            @error('long_term_ca')
-            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-
         <!-- Submit Buttons -->
         <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
             <a href="{{ route('complaints.index') }}"

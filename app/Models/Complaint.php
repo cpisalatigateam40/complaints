@@ -19,9 +19,9 @@ class Complaint extends Model
         'production_code',
         'best_before',
         'complaint_amount',
+        'unit',
         'nonconformity_type',
         'ncr',
-        'complaint_documentation',
         'customer',
         'plant_uuid',
         'delivery',
@@ -44,8 +44,8 @@ class Complaint extends Model
         return $this->hasMany(RootCause::class, 'complaint_uuid', 'uuid');
     }
 
-    public function corrective_actions()
+    public function corrective_action()
     {
-        return $this->hasMany(CorrectiveAction::class, 'complaint_uuid', 'uuid');
+        return $this->hasOne(CorrectiveAction::class, 'complaint_uuid', 'uuid');
     }
 }

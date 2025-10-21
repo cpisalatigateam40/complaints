@@ -117,25 +117,25 @@
 
 @section('script')
 <script>
-function openDetailModal(uuid) {
-    const modal = document.getElementById('detailModal');
-    const content = document.getElementById('detailContent');
+    function openDetailModal(uuid) {
+        const modal = document.getElementById('detailModal');
+        const content = document.getElementById('detailContent');
 
-    modal.classList.remove('hidden');
-    content.innerHTML = `<div class="text-center py-10 text-gray-500">Memuat data...</div>`;
+        modal.classList.remove('hidden');
+        content.innerHTML = `<div class="text-center py-10 text-gray-500">Memuat data...</div>`;
 
-    fetch(`/complaints/${uuid}`)
-        .then(res => res.text())
-        .then(html => content.innerHTML = html)
-        .catch(err => {
-            console.error(err);
-            content.innerHTML = `<div class="text-center text-red-500 py-10">Gagal memuat data.</div>`;
-        });
-}
+        fetch(`/complaints/${uuid}/show`)
+            .then(res => res.text())
+            .then(html => content.innerHTML = html)
+            .catch(err => {
+                console.error(err);
+                content.innerHTML = `<div class="text-center text-red-500 py-10">Gagal memuat data.</div>`;
+            });
+    }
 
-function closeDetailModal() {
-    document.getElementById('detailModal').classList.add('hidden');
-}
+    function closeDetailModal() {
+        document.getElementById('detailModal').classList.add('hidden');
+    }
 </script>
 
 

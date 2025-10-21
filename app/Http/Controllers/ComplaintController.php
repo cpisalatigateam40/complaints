@@ -23,8 +23,8 @@ class ComplaintController extends Controller
     public function create()
     {
         $plants = Plant::orderBy('plant', 'asc')->get();
-        $departments = Department::orderBy('department')->get();
-        
+        $departments = Department::where('department', '!=', 'Quality Control')->orderBy('department')->get();
+
         return view('complaints.create', [
             'plants' => $plants,
             'departments' => $departments,
@@ -40,6 +40,7 @@ class ComplaintController extends Controller
             'tanggalKedatangan' => 'required|date',
             'namaProduk' => 'required|string|max:255',
             'kodeProduksi' => 'required|string|max:255',
+            'unit' => 'required|string|max:255',
             'bestBefore' => 'required|date',
             'jumlahKomplain' => 'required|integer|min:1',
             'jenisKetidaksesuaian' => 'required|string',
@@ -50,21 +51,15 @@ class ComplaintController extends Controller
             'lokasiMasalah' => 'nullable|array',
             'lokasiMasalah.*' => 'string',
             'dokumentasi' => 'nullable|image|max:2048',
-
-            'causative_factor' => 'required|string',
-            'short_term_ca' => 'required|string',
-            'long_term_ca' => 'required|string',
         ]);
 
         // ✅ Upload file (if exists)
         $filePath = null;
         if ($request->hasFile('dokumentasi')) {
             $file = $request->file('dokumentasi');
-            $filename = $file->getClientOriginalExtension();
+            $filename = $file->getClientOriginalName(); // keeps original name + extension
             $filePath = $file->storeAs('complaint_docs', $filename, 'public');
         }
-        $product = Product::first();
-        $plant = Plant::first();
         // ✅ Create complaint
         $complaint = Complaint::create([
             'date' => $validated['tanggal'],
@@ -92,25 +87,17 @@ class ComplaintController extends Controller
                 ]);
             }
         }
-
-        CorrectiveAction::create([
-            'causative_factor' => $validated['causative_factor'],
-            'short_term_ca' => $validated['short_term_ca'],
-            'long_term_ca' => $validated['long_term_ca'],
-            'complaint_uuid' => $complaint->uuid,
-        ]);
-
         // ✅ Optionally handle corrective actions later (you already have that relation)
 
         return redirect()->route('complaints.index')->with('success', 'Data komplain berhasil disimpan.');
     }
 
 
-    public function show($uuid)
+    public function showComplaints($uuid)
     {
-        $complaint = Complaint::with([ 'plant', 'root_causes'])
-        ->where('uuid', $uuid)
-        ->firstOrFail();
+        $complaint = Complaint::with(['plant', 'root_causes'])
+            ->where('uuid', $uuid)
+            ->firstOrFail();
 
 
         return view('complaints.partials.detail', compact('complaint'));
@@ -126,8 +113,8 @@ class ComplaintController extends Controller
         }
 
         // 🔹 Hapus relasi corrective action jika ada
-        if ($complaint->corrective_actions()->exists()) {
-            $complaint->corrective_actions()->delete();
+        if ($complaint->corrective_action()->exists()) {
+            $complaint->corrective_action()->delete();
         }
 
         // 🔹 Hapus file dokumentasi jika ada
@@ -144,7 +131,7 @@ class ComplaintController extends Controller
 
     public function edit($uuid)
     {
-        $complaint = Complaint::with('root_causes', 'corrective_actions')->where('uuid', $uuid)->firstOrFail();
+        $complaint = Complaint::with('root_causes', 'corrective_action')->where('uuid', $uuid)->firstOrFail();
         $plants = Plant::all();
         $departments = Department::all();
 
@@ -221,11 +208,11 @@ class ComplaintController extends Controller
         }
 
         if ($complaint->corrective_action) {
-        $complaint->corrective_action->update([
-            'causative_factor' => $validated['causative_factor'] ?? '',
-            'short_term_ca' => $validated['short_term_ca'] ?? '',
-            'long_term_ca' => $validated['long_term_ca'] ?? '',
-        ]);
+            $complaint->corrective_action->update([
+                'causative_factor' => $validated['causative_factor'] ?? '',
+                'short_term_ca' => $validated['short_term_ca'] ?? '',
+                'long_term_ca' => $validated['long_term_ca'] ?? '',
+            ]);
         } else {
             CorrectiveAction::create([
                 'complaint_uuid' => $complaint->uuid,
@@ -240,9 +227,12 @@ class ComplaintController extends Controller
             ->with('success', 'Data komplain berhasil diperbarui.');
     }
 
+    public function updateData($uuid)
+    {
+        $complaint = Complaint::with('root_causes', 'corrective_action')->where('uuid', $uuid)->firstOrFail();
+        $plants = Plant::all();
+        $departments = Department::all();
 
-
-
-
-
+        return view('complaints.update', compact('complaint', 'plants', 'departments'));
+    }
 }

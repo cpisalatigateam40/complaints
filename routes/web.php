@@ -27,13 +27,16 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/plants/{uuid}/synchronize', [PlantController::class, 'synchronize'])->name('plants.synchronize');
     Route::get('/plants/{uuid}/manage-department', [PlantController::class, 'manageDepartment'])->name('plants.manage-department');
     Route::put('/plants/{uuid}/update-manage-department', [PlantController::class, 'updateManageDepartment'])->name('plants.update-manage-department');
+    //complaint
+    Route::get('/complaints/{uuid}/show', [ComplaintController::class, 'showComplaints'])->name('complaints.show-complaints');
+    Route::get('/complaints/{uuid}/update-data', [ComplaintController::class, 'updateData'])->name('complaints.update-data');
+    Route::post('/complaints/{uuid}/corrective-action-store', [ComplaintController::class, 'insertCorrectiveAction'])->name('complaints.corrective-action-store');
     //resources
     Route::resource('/dashboard', DashboardController::class)->except(['show']);
     Route::resource('/departments', DepartmentController::class)->except(['show']);
     Route::resource('/plants', PlantController::class)->except(['show']);
     Route::resource('/users', UserController::class)->except(['show']);
     Route::resource('/complaints', ComplaintController::class)->except(['show']);
-    Route::get('/complaints/{uuid}', [ComplaintController::class, 'show'])->name('complaints.show');
 
 
 
