@@ -44,6 +44,11 @@ class Complaint extends Model
         return $this->hasMany(RootCause::class, 'complaint_uuid', 'uuid');
     }
 
+    public function documentations()
+    {
+        return $this->hasMany(Documentation::class, 'complaint_uuid', 'uuid');
+    }
+
     public function corrective_action()
     {
         return $this->hasOne(CorrectiveAction::class, 'complaint_uuid', 'uuid');
