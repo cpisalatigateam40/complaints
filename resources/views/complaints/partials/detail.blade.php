@@ -6,7 +6,7 @@
         <p><strong>Nama Produk:</strong> {{ $complaint->product_name ?? '-' }}</p>
         <p><strong>Kode Produksi:</strong> {{ $complaint->production_code }}</p>
         <p><strong>Best Before:</strong> {{ $complaint->best_before->format('d/m/Y') }}</p>
-        <p><strong>Jumlah Dikomplain:</strong> {{ $complaint->complaint_amount }}</p>
+        <p><strong>Jumlah Dikomplain:</strong> {{ $complaint->complaint_amount }} {{ $complaint->unit }}</p>
         <p>
             <strong>Status:</strong>
             @if ($complaint->status == 0)

@@ -58,16 +58,43 @@
                     @enderror
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah yang Dikomplain</label>
-                    <input type="number" name="jumlahKomplain"
-                        value="{{ old('jumlahKomplain', $complaint->complaint_amount) }}"
-                        class="w-full px-3 py-2 border @error('jumlahKomplain') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required>
-                    @error('jumlahKomplain')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
+                <div class="flex gap-3">
+                    <!-- Input jumlah -->
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah yang Dikomplain</label>
+                        <input type="number" name="jumlahKomplain"
+                            value="{{ old('jumlahKomplain', $complaint->complaint_amount) }}"
+                            class="w-full px-3 py-2 border @error('jumlahKomplain') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required>
+                        @error('jumlahKomplain')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Select satuan -->
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Satuan</label>
+                        <select name="unit"
+                            class="w-full px-3 py-2 border @error('unit') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required>
+                            <option value="">-- Pilih Satuan --</option>
+                            <option value="PCS" {{ old('unit', $complaint->unit) == 'PCS' ? 'selected' : '' }}>PCS
+                            </option>
+                            <option value="GR" {{ old('unit', $complaint->unit) == 'GR' ? 'selected' : '' }}>GR</option>
+                            <option value="KG" {{ old('unit', $complaint->unit) == 'KG' ? 'selected' : '' }}>KG</option>
+                            <option value="Box" {{ old('unit', $complaint->unit) == 'Box' ? 'selected' : '' }}>Box
+                            </option>
+                            <option value="Pack" {{ old('unit', $complaint->unit) == 'Pack' ? 'selected' : '' }}>Pack
+                            </option>
+                            <option value="Karung" {{ old('unit', $complaint->unit) == 'Karung' ? 'selected' : '' }}>
+                                Karung</option>
+                        </select>
+                        @error('unit')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
+
             </div>
 
             <!-- Customer Info -->

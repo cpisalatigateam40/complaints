@@ -53,15 +53,38 @@
                     @enderror
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah yang Dikomplain</label>
-                    <input type="number" name="jumlahKomplain" value="{{ old('jumlahKomplain') }}"
-                        class="w-full px-3 py-2 border @error('jumlahKomplain') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required>
-                    @error('jumlahKomplain')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
+                <div class="flex gap-3">
+                    <!-- Input jumlah -->
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah yang Dikomplain</label>
+                        <input type="number" name="jumlahKomplain" value="{{ old('jumlahKomplain') }}"
+                            class="w-full px-3 py-2 border @error('jumlahKomplain') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required>
+                        @error('jumlahKomplain')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Select satuan -->
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Satuan</label>
+                        <select name="unit"
+                            class="w-full px-3 py-2 border @error('unit') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required>
+                            <option value="">-- Pilih Satuan --</option>
+                            <option value="PCS" {{ old('unit') == 'PCS' ? 'selected' : '' }}>PCS</option>
+                            <option value="GR" {{ old('unit') == 'GR' ? 'selected' : '' }}>GR</option>
+                            <option value="KG" {{ old('unit') == 'KG' ? 'selected' : '' }}>KG</option>
+                            <option value="Box" {{ old('unit') == 'Box' ? 'selected' : '' }}>Box</option>
+                            <option value="Pack" {{ old('unit') == 'Pack' ? 'selected' : '' }}>Pack</option>
+                            <option value="Karung" {{ old('unit') == 'Karung' ? 'selected' : '' }}>Karung</option>
+                        </select>
+                        @error('unit')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
+
             </div>
 
             <!-- Customer Info -->
@@ -97,13 +120,25 @@
                     @enderror
                 </div>
 
-                <div>
+                <!-- <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Dokumentasi Komplain</label>
                     <input type="file" name="dokumentasi" accept="image/*"
                         class="w-full px-3 py-2 border @error('dokumentasi') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     @error('dokumentasi')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
+                </div> -->
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Dokumentasi Komplain</label>
+                    <input type="file" name="dokumentasi[]" accept="image/*" multiple
+                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        onchange="previewImages(event)">
+                    @error('dokumentasi')
+                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+
+                    <div id="imagePreview" class="mt-2 flex flex-wrap gap-2"></div>
                 </div>
 
                 <div>
@@ -184,4 +219,35 @@
         </div>
     </form>
 </div>
+@endsection
+
+@section('script')
+<script>
+let allFiles = []; // menampung semua file yg dipilih
+
+function previewImages(event) {
+    const preview = document.getElementById('imagePreview');
+    const files = Array.from(event.target.files);
+
+    // tambahkan file baru ke allFiles
+    allFiles = allFiles.concat(files);
+
+    // reset preview
+    preview.innerHTML = '';
+
+    allFiles.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'w-24 h-24 object-cover rounded border';
+            preview.appendChild(img);
+        }
+        reader.readAsDataURL(file);
+    });
+
+    // reset input supaya bisa pilih file yang sama lagi jika mau
+    event.target.value = '';
+}
+</script>
 @endsection
