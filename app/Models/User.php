@@ -56,4 +56,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(DepartmentPlant::class, 'department_uuid', 'uuid');
     }
+
+    public function plants()
+    {
+        return $this->hasMany(UserPlant::class, 'user_uuid', 'uuid');
+    }
 }

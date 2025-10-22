@@ -41,4 +41,9 @@ class Plant extends Model
     {
         return $this->hasMany(Complaint::class, 'plant_uuid', 'uuid');
     }
+
+    public function users()
+    {
+        return $this->hasMany(UserPlant::class, 'plant_uuid', 'uuid');
+    }
 }

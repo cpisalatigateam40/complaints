@@ -17,6 +17,56 @@ class DepartmentSeeder extends Seeder
         Department::create([
             'uuid' => Str::uuid(),
             'department' => 'Quality Control',
+            'abbrivation' => 'QC',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Department::create([
+            'uuid' => Str::uuid(),
+            'department' => 'Eksternal',
+            'abbrivation' => 'EXT',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Department::create([
+            'uuid' => Str::uuid(),
+            'department' => 'Produksi Further',
+            'abbrivation' => 'FP',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Department::create([
+            'uuid' => Str::uuid(),
+            'department' => 'Produksi Sausage',
+            'abbrivation' => 'SP',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Department::create([
+            'uuid' => Str::uuid(),
+            'department' => 'Produksi Breadcrumb',
+            'abbrivation' => 'BC',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Department::create([
+            'uuid' => Str::uuid(),
+            'department' => 'Produksi Slaughter House',
+            'abbrivation' => 'SH',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Department::create([
+            'uuid' => Str::uuid(),
+            'department' => 'Produksi Premix',
+            'abbrivation' => 'PRX',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Department::create([
+            'uuid' => Str::uuid(),
+            'department' => 'Warehouse & Logistik',
+            'abbrivation' => 'WH',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

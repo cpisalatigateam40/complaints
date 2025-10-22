@@ -11,18 +11,18 @@
 
     {{-- Optional: konfigurasi warna kustom --}}
     <script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    primary: '#2563eb',
-                    success: '#16a34a',
-                    warning: '#facc15',
-                    danger: '#dc2626',
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        success: '#16a34a',
+                        warning: '#facc15',
+                        danger: '#dc2626',
+                    }
                 }
             }
         }
-    }
     </script>
 
     @stack('styles')
@@ -41,7 +41,7 @@
     {{-- Footer --}}
     @include('layouts.footer')
 
-    @yield('script')
+    @stack('script')
 </body>
 
 </html>

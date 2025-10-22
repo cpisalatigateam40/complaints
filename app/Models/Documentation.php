@@ -9,11 +9,12 @@ class Documentation extends Model
 {
     use HasFactory;
 
-    protected $table = "root_causes";
+    protected $table = "documentations";
     protected $primaryKey = "id";
     protected $fillable = [
-        'documentation',
-        'complaint_uuid'
+        'complaint_uuid',
+        'filename',
+        'path'
     ];
 
     public function complaint()

@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('documentations', function (Blueprint $table) {
             $table->id();
-            $table->string('documentation');
             $table->uuid('complaint_uuid');
+            $table->string('filename');
+            $table->string('path');
             $table->timestamps();
+
+            $table->foreign('complaint_uuid')->on('complaints')->references('uuid')->onDelete('cascade');
         });
     }
 

@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\DepartmentPlant;
+use App\Models\Plant;
 use App\Models\User;
 use App\Models\UserDetail;
+use App\Models\UserPlant;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -42,5 +44,19 @@ class UserSeeder extends Seeder
 
         $user1->syncRoles('Superadmin');
         $user2->syncRoles('Superadmin');
+
+        $plants = Plant::all();
+
+        foreach ($plants as $plant) {
+            UserPlant::create([
+                'plant_uuid' => $plant->uuid,
+                'user_uuid' => $user1->uuid
+            ]);
+
+            UserPlant::create([
+                'plant_uuid' => $plant->uuid,
+                'user_uuid' => $user2->uuid
+            ]);
+        }
     }
 }

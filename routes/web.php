@@ -20,6 +20,7 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/plants/branches', [PlantController::class, 'getUserPlants'])->name('plants.user');
     //users
     Route::get('/users/{uuid}/update-status', [UserController::class, 'updateStatus'])->name('users.update-status');
     //plants

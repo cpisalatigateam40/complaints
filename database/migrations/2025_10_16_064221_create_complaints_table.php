@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->date('date');
-            $table->date('product_arrival_date');
+            $table->date('product_arrival_date')->nullable();
             $table->string('product_name');
-            $table->string('production_code');
-            $table->date('best_before');
+            $table->string('production_code')->nullable();
+            $table->date('best_before')->nullable();
             $table->integer('complaint_amount');
             $table->text('nonconformity_type');
-            $table->string('ncr');
+            $table->string('ncr')->nullable();
             $table->string('complaint_documentation');
             $table->string('customer');
             $table->uuid('plant_uuid');

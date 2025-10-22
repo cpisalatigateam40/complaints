@@ -6,6 +6,7 @@ use App\Models\Complaint;
 use App\Models\Plant;
 use App\Models\Department;
 use App\Models\CorrectiveAction;
+use App\Models\Documentation;
 use App\Models\Product;
 use App\Models\RootCause;
 use Illuminate\Http\Request;
@@ -37,11 +38,11 @@ class ComplaintController extends Controller
         // ✅ Validation
         $validated = $request->validate([
             'tanggal' => 'required|date',
-            'tanggalKedatangan' => 'required|date',
+            'tanggalKedatangan' => 'nullable|date',
             'namaProduk' => 'required|string|max:255',
-            'kodeProduksi' => 'required|string|max:255',
+            'kodeProduksi' => 'nullable|string|max:255',
             'unit' => 'required|string|max:255',
-            'bestBefore' => 'required|date',
+            'bestBefore' => 'nullable|date',
             'jumlahKomplain' => 'required|integer|min:1',
             'jenisKetidaksesuaian' => 'required|string',
             'ncr' => 'nullable|string|max:255',
@@ -50,34 +51,27 @@ class ComplaintController extends Controller
             'penyampaian' => 'required|string|max:50',
             'lokasiMasalah' => 'nullable|array',
             'lokasiMasalah.*' => 'string',
-            'dokumentasi' => 'nullable|image|max:2048',
+            'dokumentasi.*' => 'nullable|image|max:4096', // ✅ multiple files
         ]);
 
-        // ✅ Upload file (if exists)
-        $filePath = null;
-        if ($request->hasFile('dokumentasi')) {
-            $file = $request->file('dokumentasi');
-            $filename = $file->getClientOriginalName(); // keeps original name + extension
-            $filePath = $file->storeAs('complaint_docs', $filename, 'public');
-        }
         // ✅ Create complaint
         $complaint = Complaint::create([
             'date' => $validated['tanggal'],
             'product_arrival_date' => $validated['tanggalKedatangan'],
-            'product_name' => $validated['namaProduk'], // You can set product UUID if available
+            'product_name' => $validated['namaProduk'],
             'production_code' => $validated['kodeProduksi'],
             'best_before' => $validated['bestBefore'],
             'complaint_amount' => $validated['jumlahKomplain'],
             'unit' => $validated['unit'],
             'nonconformity_type' => $validated['jenisKetidaksesuaian'],
             'ncr' => $validated['ncr'] ?? null,
-            'complaint_documentation' => $filePath,
             'customer' => $validated['pelanggan'],
             'plant_uuid' => $validated['cabang'],
             'delivery' => $validated['penyampaian'],
             'status' => '0',
         ]);
 
+        // ✅ Save related root causes (departments)
         if (!empty($validated['lokasiMasalah'])) {
             foreach ($validated['lokasiMasalah'] as $deptUuid) {
                 $department = Department::where('uuid', $deptUuid)->first();
@@ -88,18 +82,39 @@ class ComplaintController extends Controller
                 ]);
             }
         }
-        // ✅ Optionally handle corrective actions later (you already have that relation)
+
+        // ✅ Handle multiple file uploads
+        if ($request->hasFile('dokumentasi')) {
+            // Buat folder berdasarkan UUID komplain
+            $folderName = 'complaint_docs/' . $complaint->uuid;
+
+            foreach ($request->file('dokumentasi') as $file) {
+                if ($file->isValid()) {
+                    $filename = time() . '_' . $file->getClientOriginalName();
+
+                    // Simpan ke dalam folder berdasarkan UUID
+                    $filePath = $file->storeAs($folderName, $filename, 'public');
+
+                    // Simpan ke tabel documentation
+                    Documentation::create([
+                        'complaint_uuid' => $complaint->uuid,
+                        'filename' => $filename,
+                        'path' => $filePath, // simpan path full (misalnya: complaint_docs/uuid/file.jpg)
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('complaints.index')->with('success', 'Data komplain berhasil disimpan.');
     }
 
 
+
     public function showComplaints($uuid)
     {
-        $complaint = Complaint::with(['plant', 'root_causes'])
+        $complaint = Complaint::with(['plant', 'root_causes', 'documentations'])
             ->where('uuid', $uuid)
             ->firstOrFail();
-
 
         return view('complaints.partials.detail', compact('complaint'));
     }

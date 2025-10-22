@@ -14,7 +14,7 @@
                 <h4 class="font-medium text-gray-800 border-b pb-2">Informasi Dasar</h4>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Komplain</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Komplain*</label>
                     <input type="date" name="tanggal" value="{{ old('tanggal') }}"
                         class="w-full px-3 py-2 border @error('tanggal') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         required>
@@ -24,7 +24,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Produk</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Produk*</label>
                     <input type="text" name="namaProduk" value="{{ old('namaProduk') }}"
                         class="w-full px-3 py-2 border @error('namaProduk') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         required>
@@ -36,8 +36,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Kode Produksi</label>
                     <input type="text" name="kodeProduksi" value="{{ old('kodeProduksi') }}"
-                        class="w-full px-3 py-2 border @error('kodeProduksi') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required>
+                        class="w-full px-3 py-2 border @error('kodeProduksi') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     @error('kodeProduksi')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -46,8 +45,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Best Before</label>
                     <input type="date" name="bestBefore" value="{{ old('bestBefore') }}"
-                        class="w-full px-3 py-2 border @error('bestBefore') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required>
+                        class="w-full px-3 py-2 border @error('bestBefore') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     @error('bestBefore')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -56,7 +54,7 @@
                 <div class="flex gap-3">
                     <!-- Input jumlah -->
                     <div class="w-1/2">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah yang Dikomplain</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah yang Dikomplain*</label>
                         <input type="number" name="jumlahKomplain" value="{{ old('jumlahKomplain') }}"
                             class="w-full px-3 py-2 border @error('jumlahKomplain') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             required>
@@ -67,7 +65,7 @@
 
                     <!-- Select satuan -->
                     <div class="w-1/2">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Satuan</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Satuan*</label>
                         <select name="unit"
                             class="w-full px-3 py-2 border @error('unit') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             required>
@@ -94,15 +92,14 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Kedatangan Produk</label>
                     <input type="date" name="tanggalKedatangan" value="{{ old('tanggalKedatangan') }}"
-                        class="w-full px-3 py-2 border @error('tanggalKedatangan') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required>
+                        class="w-full px-3 py-2 border @error('tanggalKedatangan') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     @error('tanggalKedatangan')
                     <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Ketidaksesuaian</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Ketidaksesuaian*</label>
                     <textarea name="jenisKetidaksesuaian" rows="3"
                         class="w-full px-3 py-2 border @error('jenisKetidaksesuaian') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         required>{{ old('jenisKetidaksesuaian') }}</textarea>
@@ -142,7 +139,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Pelanggan</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pelanggan*</label>
                     <input type="text" name="pelanggan" value="{{ old('pelanggan') }}"
                         class="w-full px-3 py-2 border @error('pelanggan') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         required>
@@ -170,7 +167,7 @@
 
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Penyampaian</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Penyampaian*</label>
                     <select name="penyampaian"
                         class="w-full px-3 py-2 border @error('penyampaian') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         required>
@@ -223,49 +220,58 @@
 
 @section('script')
 <script>
-let allFiles = []; // menampung semua file yg dipilih
+    let allFiles = [];
 
-function previewImages(event) {
-    const files = Array.from(event.target.files);
-    allFiles = allFiles.concat(files);
+    function previewImages(event) {
+        const files = Array.from(event.target.files);
+        allFiles = allFiles.concat(files);
 
-    // reset input supaya bisa pilih file yang sama lagi
-    event.target.value = '';
+        // reset input supaya bisa pilih file yang sama lagi
+        event.target.value = '';
 
-    renderPreview();
-}
+        renderPreview();
+    }
 
-function renderPreview() {
-    const preview = document.getElementById('imagePreview');
-    preview.innerHTML = '';
+    function renderPreview() {
+        const preview = document.getElementById('imagePreview');
+        preview.innerHTML = '';
 
-    allFiles.forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = e => {
-            const container = document.createElement('div');
-            container.className = 'relative';
+        allFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const container = document.createElement('div');
+                container.className = 'relative';
 
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.className = 'w-24 h-24 object-cover rounded border';
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'w-24 h-24 object-cover rounded border';
 
-            // tombol hapus
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.innerHTML = '&times;';
-            btn.className =
-                'absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center';
-            btn.onclick = () => {
-                allFiles.splice(index, 1); // hapus file dari array
-                renderPreview(); // rerender preview
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.innerHTML = '&times;';
+                btn.className =
+                    'absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center';
+                btn.onclick = () => {
+                    allFiles.splice(index, 1);
+                    renderPreview();
+                };
+
+                container.appendChild(img);
+                container.appendChild(btn);
+                preview.appendChild(container);
             };
+            reader.readAsDataURL(file);
+        });
+    }
 
-            container.appendChild(img);
-            container.appendChild(btn);
-            preview.appendChild(container);
-        }
-        reader.readAsDataURL(file);
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const dataTransfer = new DataTransfer();
+        allFiles.forEach(file => dataTransfer.items.add(file));
+
+        // update the original input with the merged files
+        const fileInput = document.querySelector('input[name="dokumentasi[]"]');
+        fileInput.files = dataTransfer.files;
     });
-}
 </script>
+
 @endsection

@@ -42,7 +42,9 @@
                 <div class="flex items-center space-x-3">
                     <div class="text-right">
                         <p class="text-sm font-medium text-gray-800" id="userFullName">{{Auth::user()->name}}</p>
-                        <p class="text-xs text-gray-500" id="userRole">{{Auth::user()->role->role ?? '-'}}</p>
+                        <p class="text-xs text-gray-500" id="userRole">
+                            {{ Auth::user()->getRoleNames()->first() ?? '-' }}
+                        </p>
                     </div>
                     <div
                         class="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-700 rounded-full flex items-center justify-center">
@@ -189,173 +191,179 @@
     </div>
 </div>
 
-@section('script')
+@push('script')
 <script>
-let complaints = [];
-let editingIndex = -1;
-let currentUser = null;
-let editingUserIndex = -1;
-let selectedBranches = ['all']; // Default: semua cabang
+    let selectedBranches = ['all']; // Default: all selected
+    let branches = []; // will be filled dynamically from backend
 
-const branches = [{
-        id: 'salatiga',
-        name: 'Salatiga'
-    },
-    {
-        id: 'sragen',
-        name: 'Sragen'
-    },
-    {
-        id: 'banyumas',
-        name: 'Banyumas'
-    },
-    {
-        id: 'pemalang',
-        name: 'Pemalang'
-    },
-    {
-        id: 'kebumen',
-        name: 'Kebumen'
-    },
-    {
-        id: 'banjarbaru',
-        name: 'Banjarbaru'
-    },
-    {
-        id: 'balikpapan',
-        name: 'Balikpapan'
+    // Fetch user's plants when the modal opens
+    async function openBranchModal() {
+        const modal = document.getElementById('branchModal');
+        modal.classList.remove('hidden');
+
+        // Animate modal
+        setTimeout(() => {
+            modal.querySelector('.bg-white').classList.remove('scale-95');
+            modal.querySelector('.bg-white').classList.add('scale-100');
+        }, 10);
+
+        // If already loaded once, don’t reload
+        if (branches.length === 0) {
+            await fetchBranchesFromServer();
+        }
+
+        // Render the branch checkboxes
+        renderBranchCheckboxes();
+        updateSelectedBranchCount();
     }
-];
 
-function openBranchModal() {
-    const modal = document.getElementById('branchModal');
-    modal.classList.remove('hidden');
-    // Add animation
-    setTimeout(() => {
-        modal.querySelector('.bg-white').classList.remove('scale-95');
-        modal.querySelector('.bg-white').classList.add('scale-100');
-    }, 10);
-}
+    async function fetchBranchesFromServer() {
+        try {
+            const response = await fetch(`{{ route('plants.user') }}`);
+            const data = await response.json();
 
-function closeBranchModal() {
-    const modal = document.getElementById('branchModal');
-    modal.querySelector('.bg-white').classList.remove('scale-100');
-    modal.querySelector('.bg-white').classList.add('scale-95');
-    setTimeout(() => {
-        modal.classList.add('hidden');
-    }, 200);
-}
-
-function resetBranchFilter() {
-    selectedBranches = ['all'];
-    document.getElementById('branchAll').checked = true;
-    branches.forEach(branch => {
-        document.getElementById(`branch_${branch.id}`).checked = false;
-    });
-    updateSelectedBranchCount();
-}
-
-function handleBranchSelection(branchId) {
-    if (branchId === 'all') {
-        const allCheckbox = document.getElementById('branchAll');
-        const individualCheckboxes = branches.map(b => document.getElementById(`branch_${b.id}`));
-
-        if (allCheckbox.checked) {
-            // Select all
-            selectedBranches = ['all'];
-            individualCheckboxes.forEach(cb => cb.checked = false);
-        } else {
-            // Deselect all
-            selectedBranches = [];
-        }
-    } else {
-        const branchCheckbox = document.getElementById(`branch_${branchId}`);
-        const allCheckbox = document.getElementById('branchAll');
-
-        if (branchCheckbox.checked) {
-            // Add branch to selection
-            if (selectedBranches.includes('all')) {
-                selectedBranches = [branchId];
-                allCheckbox.checked = false;
-            } else {
-                selectedBranches.push(branchId);
-            }
-        } else {
-            // Remove branch from selection
-            selectedBranches = selectedBranches.filter(id => id !== branchId);
-            allCheckbox.checked = false;
-        }
-
-        // If all individual branches are selected, check "all"
-        const allIndividualSelected = branches.every(b =>
-            document.getElementById(`branch_${b.id}`).checked
-        );
-
-        if (allIndividualSelected) {
-            selectedBranches = ['all'];
-            allCheckbox.checked = true;
-            branches.forEach(b => {
-                document.getElementById(`branch_${b.id}`).checked = false;
-            });
+            // Fill branches array from backend
+            branches = data.plants.map(plant => ({
+                id: plant.uuid,
+                name: plant.plant
+            }));
+        } catch (error) {
+            console.error("Failed to load branches:", error);
         }
     }
 
-    updateSelectedBranchCount();
-}
+    function renderBranchCheckboxes() {
+        const container = document.getElementById('branchCheckboxes');
+        container.innerHTML = ''; // clear previous
 
-function updateSelectedBranchCount() {
-    const countElement = document.getElementById('selectedBranchCount');
-    if (selectedBranches.includes('all')) {
-        countElement.textContent = '7 cabang dipilih';
-    } else {
-        countElement.textContent = `${selectedBranches.length} cabang dipilih`;
+        branches.forEach(branch => {
+            const isChecked = selectedBranches.includes(branch.id);
+            const checkboxHTML = `
+                <label class="flex items-center space-x-3 p-3 hover:bg-blue-50 rounded-xl cursor-pointer transition-colors duration-200 border-2 border-transparent hover:border-blue-100">
+                    <input type="checkbox" id="branch_${branch.id}" onchange="handleBranchSelection('${branch.id}')"
+                        class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2" ${isChecked ? 'checked' : ''}>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-4 h-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full shadow-sm"></div>
+                        <span class="font-medium text-gray-800">${branch.name}</span>
+                    </div>
+                </label>
+            `;
+            container.insertAdjacentHTML('beforeend', checkboxHTML);
+        });
     }
-}
 
-function applyBranchFilter() {
-    // Ensure at least one branch is selected
-    if (selectedBranches.length === 0) {
+    function closeBranchModal() {
+        const modal = document.getElementById('branchModal');
+        modal.querySelector('.bg-white').classList.remove('scale-100');
+        modal.querySelector('.bg-white').classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 200);
+    }
+
+    function resetBranchFilter() {
         selectedBranches = ['all'];
         document.getElementById('branchAll').checked = true;
+
+        branches.forEach(branch => {
+            const checkbox = document.getElementById(`branch_${branch.id}`);
+            if (checkbox) checkbox.checked = false;
+        });
+
+        updateSelectedBranchCount();
     }
 
-    updateBranchFilterText();
-    closeBranchModal();
+    function handleBranchSelection(branchId) {
+        if (branchId === 'all') {
+            const allCheckbox = document.getElementById('branchAll');
 
-    // Refresh current page data
-    const currentPage = getCurrentPage();
-    if (currentPage === 'dashboard') {
-        updateDashboard();
-    } else if (currentPage === 'complaints') {
-        updateComplaintsTable();
-    } else if (currentPage === 'users') {
-        updateUsersTable();
-        updateUserStats();
+            if (allCheckbox.checked) {
+                selectedBranches = ['all'];
+                branches.forEach(b => {
+                    const cb = document.getElementById(`branch_${b.id}`);
+                    if (cb) cb.checked = false;
+                });
+            } else {
+                selectedBranches = [];
+            }
+        } else {
+            const branchCheckbox = document.getElementById(`branch_${branchId}`);
+            const allCheckbox = document.getElementById('branchAll');
+
+            if (branchCheckbox.checked) {
+                if (selectedBranches.includes('all')) {
+                    selectedBranches = [branchId];
+                    allCheckbox.checked = false;
+                } else {
+                    selectedBranches.push(branchId);
+                }
+            } else {
+                selectedBranches = selectedBranches.filter(id => id !== branchId);
+                allCheckbox.checked = false;
+            }
+
+            // If all individual branches selected → switch to "all"
+            const allSelected = branches.every(b => document.getElementById(`branch_${b.id}`)?.checked);
+            if (allSelected) {
+                selectedBranches = ['all'];
+                allCheckbox.checked = true;
+                branches.forEach(b => {
+                    document.getElementById(`branch_${b.id}`).checked = false;
+                });
+            }
+        }
+
+        updateSelectedBranchCount();
     }
-}
 
-function updateBranchFilterText() {
-    const textElement = document.getElementById('branchFilterText');
-    if (selectedBranches.includes('all')) {
-        textElement.textContent = 'Semua Cabang';
-    } else if (selectedBranches.length === 1) {
-        const branchName = branches.find(b => b.id === selectedBranches[0])?.name;
-        textElement.textContent = branchName || 'Pilih Cabang';
-    } else if (selectedBranches.length <= 3) {
-        const branchNames = selectedBranches.map(id =>
-            branches.find(b => b.id === id)?.name
-        ).join(', ');
-        textElement.textContent = branchNames;
-    } else {
-        textElement.textContent = `${selectedBranches.length} Cabang Dipilih`;
+    function updateSelectedBranchCount() {
+        const countElement = document.getElementById('selectedBranchCount');
+        if (selectedBranches.includes('all')) {
+            countElement.textContent = `${branches.length} cabang dipilih`;
+        } else {
+            countElement.textContent = `${selectedBranches.length} cabang dipilih`;
+        }
     }
-}
 
-function logout() {
-    // Create custom confirmation modal
-    const confirmModal = document.createElement('div');
-    confirmModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-    confirmModal.innerHTML = `
+    function applyBranchFilter() {
+        if (selectedBranches.length === 0) {
+            selectedBranches = ['all'];
+            document.getElementById('branchAll').checked = true;
+        }
+
+        updateBranchFilterText();
+        closeBranchModal();
+
+        // You can call your refresh functions here (if needed)
+        // updateDashboard() / updateComplaintsTable()
+    }
+
+    function updateBranchFilterText() {
+        const textElement = document.getElementById('branchFilterText');
+
+        if (selectedBranches.includes('all')) {
+            textElement.textContent = 'Semua Cabang';
+        } else if (selectedBranches.length === 1) {
+            const branchName = branches.find(b => b.id === selectedBranches[0])?.name;
+            textElement.textContent = branchName || 'Pilih Cabang';
+        } else if (selectedBranches.length <= 3) {
+            const branchNames = selectedBranches.map(id =>
+                branches.find(b => b.id === id)?.name
+            ).join(', ');
+            textElement.textContent = branchNames;
+        } else {
+            textElement.textContent = `${selectedBranches.length} Cabang Dipilih`;
+        }
+    }
+
+    // Optional: you can preload branches on page load if preferred
+    document.addEventListener('DOMContentLoaded', fetchBranchesFromServer);
+
+    function logout() {
+        // Create custom confirmation modal
+        const confirmModal = document.createElement('div');
+        confirmModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        confirmModal.innerHTML = `
 <div class="bg-white rounded-lg p-6 max-w-md mx-4">
 <h3 class="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Logout</h3>
 <p class="text-gray-600 mb-6">Apakah Anda yakin ingin keluar dari sistem?</p>
@@ -372,16 +380,16 @@ function logout() {
 </div>
 </div>
             `;
-    document.body.appendChild(confirmModal);
-}
+        document.body.appendChild(confirmModal);
+    }
 
-function confirmLogout() {
-    currentUser = null;
-    localStorage.removeItem('currentUser');
-    showLoginPage();
-    // Reset form
-    document.getElementById('loginForm').reset();
-    document.getElementById('loginError').classList.add('hidden');
-}
+    function confirmLogout() {
+        currentUser = null;
+        localStorage.removeItem('currentUser');
+        showLoginPage();
+        // Reset form
+        document.getElementById('loginForm').reset();
+        document.getElementById('loginError').classList.add('hidden');
+    }
 </script>
-@endsection
+@endpush

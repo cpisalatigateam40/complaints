@@ -115,7 +115,7 @@
 
 @endsection
 
-@section('script')
+@push('script')
 <script>
     function openDetailModal(uuid) {
         const modal = document.getElementById('detailModal');
@@ -139,4 +139,4 @@
 </script>
 
 
-@endsection
+@endpush

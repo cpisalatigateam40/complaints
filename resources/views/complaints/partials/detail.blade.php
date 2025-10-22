@@ -4,8 +4,10 @@
         <p><strong>No:</strong> {{ $complaint->id }}</p>
         <p><strong>Tanggal:</strong> {{ $complaint->date->format('d/m/Y') }}</p>
         <p><strong>Nama Produk:</strong> {{ $complaint->product_name ?? '-' }}</p>
-        <p><strong>Kode Produksi:</strong> {{ $complaint->production_code }}</p>
-        <p><strong>Best Before:</strong> {{ $complaint->best_before->format('d/m/Y') }}</p>
+        <p><strong>Kode Produksi:</strong> {{ $complaint->production_code ?? '-'}}</p>
+        <p><strong>Best Before:</strong>
+            {{ $complaint->best_before ? $complaint->best_before->format('d/m/Y') : '-' }}
+        </p>
         <p><strong>Jumlah Dikomplain:</strong> {{ $complaint->complaint_amount }} {{ $complaint->unit }}</p>
         <p>
             <strong>Status:</strong>
@@ -20,7 +22,7 @@
     <div class="space-y-4">
         <h4 class="text-lg font-semibold mb-2 border-b pb-1">Informasi Pelanggan</h4>
         <p><strong>Pelanggan:</strong> {{ $complaint->customer }}</p>
-        <p><strong>Tanggal Kedatangan:</strong> {{ $complaint->product_arrival_date->format('d/m/Y') }}</p>
+        <p><strong>Tanggal Kedatangan:</strong> {{ $complaint->product_arrival_date ? $complaint->product_arrival_date->format('d/m/Y') : '-'}}</p>
         <p><strong>Penyampaian:</strong> {{ $complaint->delivery }}</p>
         <p><strong>NCR:</strong> {{ $complaint->ncr ?? '-' }}</p>
     </div>
@@ -44,5 +46,23 @@
         @empty
         -
         @endforelse
+    </div>
+
+    {{-- 🖼️ New Documentation Section --}}
+    <div class="space-y-4">
+        <strong>Dokumentasi Komplain</strong><br>
+        @if ($complaint->documentations->isNotEmpty())
+        <div class="flex flex-wrap gap-3 mt-2">
+            @foreach ($complaint->documentations as $doc)
+            <a href="{{ asset('storage/' . $doc->path) }}" target="_blank">
+                <img src="{{ asset('storage/' . $doc->path) }}"
+                    alt="Dokumentasi Komplain"
+                    class="w-32 h-32 object-cover rounded border hover:scale-105 transition-transform">
+            </a>
+            @endforeach
+        </div>
+        @else
+        <p>-</p>
+        @endif
     </div>
 </div>

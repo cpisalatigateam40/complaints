@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Department;
 use App\Models\Plant;
 use App\Models\Project;
+use App\Models\UserPlant;
 use App\Traits\SyncsPivotRelations;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +31,7 @@ class PlantController extends Controller
         if ($search) {
             $plantsQuery->where(function ($query) use ($search) {
                 $query->where('plant', 'like', '%' . $search . '%')
-                      ->orWhere('abbrivation', 'like', '%' . $search . '%');
+                    ->orWhere('abbrivation', 'like', '%' . $search . '%');
             });
         }
 
@@ -227,5 +228,20 @@ class PlantController extends Controller
                 'message' => 'Exception: ' . $e->getMessage()
             ];
         }
+    }
+
+    public function getUserPlants()
+    {
+        $user = Auth::user();
+
+        // Get user's plants via UserPlant pivot
+        $plants = UserPlant::with('plant:id,uuid,plant')
+            ->where('user_uuid', $user->uuid)
+            ->get()
+            ->pluck('plant'); // Only keep actual plant data
+
+        return response()->json([
+            'plants' => $plants
+        ]);
     }
 }
