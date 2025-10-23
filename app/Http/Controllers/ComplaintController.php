@@ -15,7 +15,7 @@ class ComplaintController extends Controller
 {
     public function index()
     {
-        $complaint = Complaint::all();
+        $complaint = Complaint::paginate(1);
         return view('complaints.index', [
             'complaints' => $complaint
         ]);

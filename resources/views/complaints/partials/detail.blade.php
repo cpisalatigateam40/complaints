@@ -24,7 +24,16 @@
         <p><strong>Pelanggan:</strong> {{ $complaint->customer }}</p>
         <p><strong>Tanggal Kedatangan:</strong>
             {{ $complaint->product_arrival_date ? $complaint->product_arrival_date->format('d/m/Y') : '-'}}</p>
-        <p><strong>Penyampaian:</strong> {{ $complaint->delivery }}</p>
+        @php
+        $deliveryLabels = [
+        1 => 'Email',
+        2 => 'Telepon',
+        3 => 'WhatsApp',
+        4 => 'Langsung',
+        ];
+        @endphp
+
+        <p><strong>Penyampaian:</strong> {{ $deliveryLabels[$complaint->delivery] ?? '-' }}</p>
         <p><strong>NCR:</strong> {{ $complaint->ncr ?? '-' }}</p>
     </div>
 </div>
