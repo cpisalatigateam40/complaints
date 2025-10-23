@@ -22,7 +22,8 @@
     <div class="space-y-4">
         <h4 class="text-lg font-semibold mb-2 border-b pb-1">Informasi Pelanggan</h4>
         <p><strong>Pelanggan:</strong> {{ $complaint->customer }}</p>
-        <p><strong>Tanggal Kedatangan:</strong> {{ $complaint->product_arrival_date ? $complaint->product_arrival_date->format('d/m/Y') : '-'}}</p>
+        <p><strong>Tanggal Kedatangan:</strong>
+            {{ $complaint->product_arrival_date ? $complaint->product_arrival_date->format('d/m/Y') : '-'}}</p>
         <p><strong>Penyampaian:</strong> {{ $complaint->delivery }}</p>
         <p><strong>NCR:</strong> {{ $complaint->ncr ?? '-' }}</p>
     </div>
@@ -55,8 +56,7 @@
         <div class="flex flex-wrap gap-3 mt-2">
             @foreach ($complaint->documentations as $doc)
             <a href="{{ asset('storage/' . $doc->path) }}" target="_blank">
-                <img src="{{ asset('storage/' . $doc->path) }}"
-                    alt="Dokumentasi Komplain"
+                <img src="{{ asset('storage/' . $doc->path) }}" alt="Dokumentasi Komplain"
                     class="w-32 h-32 object-cover rounded border hover:scale-105 transition-transform">
             </a>
             @endforeach
