@@ -23,7 +23,7 @@
     </div>
 
     <!-- Complaints Table -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden p-4">
         <div class="overflow-x-auto">
             <table class="min-w-full">
                 <thead class="bg-gray-50">
@@ -52,10 +52,22 @@
                             </span>
                         </td>
                         <td class="px-4 py-4">
-                            @if($item->status == '0')
-                            <span class="px-2 py-1 rounded-full text-sm bg-red-100 text-red-700">Open</span>
+                            @if ($item->status == '0')
+                            <span class="px-2 py-1 rounded-full text-sm bg-red-100 text-red-700">
+                                Open
+                            </span>
+                            @elseif ($item->status == '1')
+                            <span class="px-2 py-1 rounded-full text-sm bg-yellow-100 text-yellow-700">
+                                Sedang Diinvestigasi
+                            </span>
+                            @elseif ($item->status == '2')
+                            <span class="px-2 py-1 rounded-full text-sm bg-green-100 text-green-700">
+                                Selesai
+                            </span>
                             @else
-                            <span class="px-2 py-1 rounded-full text-sm bg-green-100 text-green-700">Close</span>
+                            <span class="px-2 py-1 rounded-full text-sm bg-gray-100 text-gray-700">
+                                Tidak Diketahui
+                            </span>
                             @endif
                         </td>
                         <td class="px-4 py-4 space-x-2">
@@ -73,6 +85,13 @@
                                     Hapus
                                 </button>
                             </form>
+
+                            <select onchange="updateStatus('{{ $item->uuid }}', this.value)"
+                                class="ml-2 border rounded px-2 py-1 text-sm focus:ring-2 focus:ring-blue-400">
+                                <option value="0" @selected($item->status == 0)>Open</option>
+                                <option value="1" @selected($item->status == 1)>Investigasi</option>
+                                <option value="2" @selected($item->status == 2)>Close</option>
+                            </select>
                         </td>
                     </tr>
                     @empty
@@ -83,7 +102,13 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="mt-4">
+            {{ $complaints->links() }}
+        </div>
     </div>
+
+
 </div>
 
 <!-- Add/Edit Complaint Modal -->
@@ -117,25 +142,48 @@
 
 @push('script')
 <script>
-    function openDetailModal(uuid) {
-        const modal = document.getElementById('detailModal');
-        const content = document.getElementById('detailContent');
+function openDetailModal(uuid) {
+    const modal = document.getElementById('detailModal');
+    const content = document.getElementById('detailContent');
 
-        modal.classList.remove('hidden');
-        content.innerHTML = `<div class="text-center py-10 text-gray-500">Memuat data...</div>`;
+    modal.classList.remove('hidden');
+    content.innerHTML = `<div class="text-center py-10 text-gray-500">Memuat data...</div>`;
 
-        fetch(`/complaints/${uuid}/show`)
-            .then(res => res.text())
-            .then(html => content.innerHTML = html)
-            .catch(err => {
-                console.error(err);
-                content.innerHTML = `<div class="text-center text-red-500 py-10">Gagal memuat data.</div>`;
-            });
-    }
+    fetch(`/complaints/${uuid}/show`)
+        .then(res => res.text())
+        .then(html => content.innerHTML = html)
+        .catch(err => {
+            console.error(err);
+            content.innerHTML = `<div class="text-center text-red-500 py-10">Gagal memuat data.</div>`;
+        });
+}
 
-    function closeDetailModal() {
-        document.getElementById('detailModal').classList.add('hidden');
-    }
+function closeDetailModal() {
+    document.getElementById('detailModal').classList.add('hidden');
+}
+
+function updateStatus(uuid, newStatus) {
+    if (!confirm('Yakin ingin mengubah status komplain ini?')) return;
+
+    fetch(`/complaints/${uuid}/update-status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Status berhasil diperbarui');
+            location.reload();
+        } else {
+            alert('Gagal memperbarui status');
+        }
+    })
+    .catch(() => alert('Terjadi kesalahan koneksi'));
+}
 </script>
 
 
