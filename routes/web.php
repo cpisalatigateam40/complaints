@@ -32,6 +32,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/complaints/{uuid}/show', [ComplaintController::class, 'showComplaints'])->name('complaints.show-complaints');
     Route::get('/complaints/{uuid}/update-data', [ComplaintController::class, 'updateData'])->name('complaints.update-data');
     Route::post('/complaints/{uuid}/corrective-action-store', [ComplaintController::class, 'insertCorrectiveAction'])->name('complaints.corrective-action-store');
+    Route::put('/complaints/{uuid}/update-status', [ComplaintController::class, 'updateStatus'])->name('complaints.updateStatus');
+
     //resources
     Route::resource('/dashboard', DashboardController::class)->except(['show']);
     Route::resource('/departments', DepartmentController::class)->except(['show']);

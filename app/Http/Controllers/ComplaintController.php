@@ -15,9 +15,10 @@ class ComplaintController extends Controller
 {
     public function index()
     {
-        $complaint = Complaint::paginate(1);
+        $complaints = Complaint::orderBy('created_at', 'desc')->paginate(10);
+
         return view('complaints.index', [
-            'complaints' => $complaint
+            'complaints' => $complaints
         ]);
     }
 
@@ -253,4 +254,14 @@ class ComplaintController extends Controller
 
         return view('complaints.update', compact('complaint', 'plants', 'departments'));
     }
+
+    public function updateStatus(Request $request, $uuid)
+    {
+        $complaint = Complaint::where('uuid', $uuid)->firstOrFail();
+        $complaint->status = $request->status;
+        $complaint->save();
+
+        return response()->json(['success' => true]);
+    }
+
 }

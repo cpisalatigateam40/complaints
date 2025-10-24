@@ -52,10 +52,22 @@
                             </span>
                         </td>
                         <td class="px-4 py-4">
-                            @if($item->status == '0')
-                            <span class="px-2 py-1 rounded-full text-sm bg-red-100 text-red-700">Open</span>
+                            @if ($item->status == '0')
+                            <span class="px-2 py-1 rounded-full text-sm bg-red-100 text-red-700">
+                                Open
+                            </span>
+                            @elseif ($item->status == '1')
+                            <span class="px-2 py-1 rounded-full text-sm bg-yellow-100 text-yellow-700">
+                                Sedang Diinvestigasi
+                            </span>
+                            @elseif ($item->status == '2')
+                            <span class="px-2 py-1 rounded-full text-sm bg-green-100 text-green-700">
+                                Selesai
+                            </span>
                             @else
-                            <span class="px-2 py-1 rounded-full text-sm bg-green-100 text-green-700">Close</span>
+                            <span class="px-2 py-1 rounded-full text-sm bg-gray-100 text-gray-700">
+                                Tidak Diketahui
+                            </span>
                             @endif
                         </td>
                         <td class="px-4 py-4 space-x-2">
@@ -73,6 +85,13 @@
                                     Hapus
                                 </button>
                             </form>
+
+                            <select onchange="updateStatus('{{ $item->uuid }}', this.value)"
+                                class="ml-2 border rounded px-2 py-1 text-sm focus:ring-2 focus:ring-blue-400">
+                                <option value="0" @selected($item->status == 0)>Open</option>
+                                <option value="1" @selected($item->status == 1)>Investigasi</option>
+                                <option value="2" @selected($item->status == 2)>Close</option>
+                            </select>
                         </td>
                     </tr>
                     @empty
@@ -141,6 +160,29 @@ function openDetailModal(uuid) {
 
 function closeDetailModal() {
     document.getElementById('detailModal').classList.add('hidden');
+}
+
+function updateStatus(uuid, newStatus) {
+    if (!confirm('Yakin ingin mengubah status komplain ini?')) return;
+
+    fetch(`/complaints/${uuid}/update-status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Status berhasil diperbarui');
+            location.reload();
+        } else {
+            alert('Gagal memperbarui status');
+        }
+    })
+    .catch(() => alert('Terjadi kesalahan koneksi'));
 }
 </script>
 
