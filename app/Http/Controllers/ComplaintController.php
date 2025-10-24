@@ -51,7 +51,7 @@ class ComplaintController extends Controller
             'penyampaian' => 'required|string|max:50',
             'lokasiMasalah' => 'nullable|array',
             'lokasiMasalah.*' => 'string',
-            'dokumentasi.*' => 'nullable|image|max:4096', // ✅ multiple files
+            'dokumentasi.*' => 'nullable|image|max:4096',
         ]);
 
         // ✅ Create complaint
@@ -60,7 +60,7 @@ class ComplaintController extends Controller
             'product_arrival_date' => $validated['tanggalKedatangan'],
             'product_name' => $validated['namaProduk'],
             'production_code' => $validated['kodeProduksi'],
-            'best_before' => $validated['bestBefore'],
+            'best_before' => $request->bestBefore,
             'complaint_amount' => $validated['jumlahKomplain'],
             'unit' => $validated['unit'],
             'nonconformity_type' => $validated['jenisKetidaksesuaian'],
@@ -104,6 +104,13 @@ class ComplaintController extends Controller
                 }
             }
         }
+
+        CorrectiveAction::create([
+            'complaint_uuid' => $complaint->uuid,
+            'short_term_ca' => $request->short_term_ca ?? NULL,
+            'long_term_ca' => $request->long_term_ca ?? NULL,
+            'causative_factor' => $request->causative_factor ?? NULL
+        ]);
 
         return redirect()->route('complaints.index')->with('success', 'Data komplain berhasil disimpan.');
     }
