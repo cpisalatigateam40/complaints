@@ -204,7 +204,7 @@
         </div>
 
         <!-- Faktor Penyebab -->
-        <div class="mb-4">
+        <!-- <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">Faktor Penyebab</label>
             <textarea name="causative_factor"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -212,10 +212,10 @@
             @error('causative_factor')
             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
             @enderror
-        </div>
+        </div> -->
 
         <!-- Tindakan Perbaikan -->
-        <div class="mb-4 border-t pt-4">
+        <!-- <div class="mb-4 border-t pt-4">
             <h4 class="font-medium text-gray-800 mb-2">Tindakan Perbaikan</h4>
 
             <label class="block text-sm font-medium text-gray-700 mb-1">Tindakan Perbaikan Jangka Pendek</label>
@@ -233,7 +233,7 @@
             @error('long_term_ca')
             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
             @enderror
-        </div>
+        </div> -->
 
 
         <!-- Submit Buttons -->
@@ -253,58 +253,58 @@
 
 @section('script')
 <script>
-let allFiles = [];
+    let allFiles = [];
 
-function previewImages(event) {
-    const files = Array.from(event.target.files);
-    allFiles = allFiles.concat(files);
+    function previewImages(event) {
+        const files = Array.from(event.target.files);
+        allFiles = allFiles.concat(files);
 
-    // reset input supaya bisa pilih file yang sama lagi
-    event.target.value = '';
+        // reset input supaya bisa pilih file yang sama lagi
+        event.target.value = '';
 
-    renderPreview();
-}
+        renderPreview();
+    }
 
-function renderPreview() {
-    const preview = document.getElementById('imagePreview');
-    preview.innerHTML = '';
+    function renderPreview() {
+        const preview = document.getElementById('imagePreview');
+        preview.innerHTML = '';
 
-    allFiles.forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = e => {
-            const container = document.createElement('div');
-            container.className = 'relative';
+        allFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const container = document.createElement('div');
+                container.className = 'relative';
 
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.className = 'w-24 h-24 object-cover rounded border';
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'w-24 h-24 object-cover rounded border';
 
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.innerHTML = '&times;';
-            btn.className =
-                'absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center';
-            btn.onclick = () => {
-                allFiles.splice(index, 1);
-                renderPreview();
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.innerHTML = '&times;';
+                btn.className =
+                    'absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center';
+                btn.onclick = () => {
+                    allFiles.splice(index, 1);
+                    renderPreview();
+                };
+
+                container.appendChild(img);
+                container.appendChild(btn);
+                preview.appendChild(container);
             };
+            reader.readAsDataURL(file);
+        });
+    }
 
-            container.appendChild(img);
-            container.appendChild(btn);
-            preview.appendChild(container);
-        };
-        reader.readAsDataURL(file);
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const dataTransfer = new DataTransfer();
+        allFiles.forEach(file => dataTransfer.items.add(file));
+
+        // update the original input with the merged files
+        const fileInput = document.querySelector('input[name="dokumentasi[]"]');
+        fileInput.files = dataTransfer.files;
     });
-}
-
-document.querySelector('form').addEventListener('submit', function(e) {
-    const dataTransfer = new DataTransfer();
-    allFiles.forEach(file => dataTransfer.items.add(file));
-
-    // update the original input with the merged files
-    const fileInput = document.querySelector('input[name="dokumentasi[]"]');
-    fileInput.files = dataTransfer.files;
-});
 </script>
 
 @endsection

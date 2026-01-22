@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
+use App\Models\DepartmentPlant;
 use App\Models\Plant;
 use App\Models\User;
+use App\Models\UserPlant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -23,8 +26,9 @@ class UserController extends Controller
     public function create()
     {
         $plants = Plant::all();
+        $departments = Department::all();
         $roles = Role::all();
-        return view('users.create', compact('plants', 'roles'));
+        return view('users.create', compact('plants', 'roles', 'departments'));
     }
 
     /**
@@ -33,23 +37,43 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'username' => 'required|string|max:255',
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'password' => 'required|string|max:255',
-            'user_role' => 'required|string|exists:roles,name'
+            'username'       => 'required|string|max:255|unique:users,username',
+            'name'           => 'required|string|max:255',
+            'email'          => 'nullable|email|unique:users,email',
+            'password'       => 'required|string|min:6|max:255',
+            'user_role'      => 'required|string|exists:roles,name',
+            'department'     => 'required|exists:departments,uuid',
+            'userBranches'   => 'required|array|min:1',
+            'userBranches.*' => 'exists:plants,uuid',
         ]);
 
+        // Find the corresponding department_plant entry
+        $department = DepartmentPlant::where('department_uuid', $request->department)
+            ->where('plant_uuid', Auth::user()->department->plant_uuid)
+            ->first();
+
+        // Create new user
         $user = User::create([
-            'username' => $request->username,
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'department_uuid' => $request->department ?? Auth::user()->department->uuid,
+            'username'        => $request->username,
+            'name'            => $request->name,
+            'email'           => $request->email,
+            'password'        => Hash::make($request->password),
+            'department_uuid' => $department ? $department->uuid : Auth::user()->department->uuid,
+            'status'          => $request->userStatus ?? 'active',
         ]);
 
+        // Assign the selected role
         $user->assignRole($request->user_role);
-        return redirect()->route('users.index')->with('success', 'User created successfully');
+
+        // Attach plants (branches) to user
+        foreach ($request->userBranches as $branchUuid) {
+            UserPlant::create([
+                'user_uuid'  => $user->uuid,
+                'plant_uuid' => $branchUuid,
+            ]);
+        }
+
+        return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
 
     /**

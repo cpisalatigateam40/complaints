@@ -9,11 +9,12 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\CustomVerifyEmail;
+use App\Traits\HasUuid;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use  HasFactory, Notifiable,  HasRoles;
+    use  HasFactory, Notifiable,  HasRoles, HasUuid;
 
     /**
      * The attributes that are mass assignable.
@@ -26,7 +27,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'department_uuid'
+        'department_uuid',
+        'status'
     ];
 
     /**

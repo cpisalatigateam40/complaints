@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="bg-white shadow rounded-lg p-6">
-    <h2 class="text-xl font-semibold mb-4">Tambah Data Komplain</h2>
+    <h2 class="text-xl font-semibold mb-4">Update Data Komplain</h2>
 
     <form action="{{ route('complaints.corrective-action-store', $complaint->uuid) }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-6">
         @csrf
@@ -58,13 +58,19 @@
                     <span>{{$complaint->ncr}}</span>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Dokumentasi Komplain</label>
-                    <p class="text-sm text-gray-600 mt-2">File saat ini:
-                        <a href="{{ asset('storage/'.$complaint->complaint_documentation) }}" target="_blank"
-                            class="text-blue-600 hover:underline">Lihat</a>
-                    </p>
+                <strong>Dokumentasi Komplain</strong><br>
+                @if ($complaint->documentations->isNotEmpty())
+                <div class="flex flex-wrap gap-3 mt-2">
+                    @foreach ($complaint->documentations as $doc)
+                    <a href="{{ asset('storage/' . $doc->path) }}" target="_blank">
+                        <img src="{{ asset('storage/' . $doc->path) }}" alt="Dokumentasi Komplain"
+                            class="w-32 h-32 object-cover rounded border hover:scale-105 transition-transform">
+                    </a>
+                    @endforeach
                 </div>
+                @else
+                <p>-</p>
+                @endif
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Pelanggan</label>
@@ -149,6 +155,12 @@
             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
             @enderror
         </div>
+        @if($complaint->status == 3)
+        <div class="space-y-4">
+            <strong>Alasan Ditolak</strong>
+            <p>{{$complaint->notes}}</p>
+        </div>
+        @endif
 
 
         <!-- Submit Buttons -->

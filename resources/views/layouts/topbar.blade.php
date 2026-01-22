@@ -91,7 +91,7 @@
                     </svg>
                     <span>Data Komplain</span>
                 </a>
-
+                @can('can access users')
                 <a href="{{ route('users.index') }}"
                     class="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200
     {{ request()->is('users*') ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100' }}">
@@ -102,7 +102,8 @@
                     </svg>
                     <span>Manajemen User</span>
                 </a>
-
+                @endcan
+                @can('can access plants')
                 <a href="{{ route('plants.index') }}"
                     class="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200
     {{ request()->is('plants*') ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100' }}">
@@ -113,7 +114,8 @@
                     </svg>
                     <span>Plant</span>
                 </a>
-
+                @endcan
+                @can('can access departments')
                 <a href="{{ route('departments.index') }}"
                     class="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200
     {{ request()->is('departments*') ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100' }}">
@@ -124,6 +126,7 @@
                     </svg>
                     <span>Department</span>
                 </a>
+                @endcan
 
 
 

@@ -6,6 +6,7 @@ use App\Models\Complaint;
 use App\Models\Plant;
 use App\Models\Department;
 use App\Models\CorrectiveAction;
+use App\Models\DepartmentPlant;
 use App\Models\Documentation;
 use App\Models\Product;
 use App\Models\RootCause;
@@ -13,13 +14,188 @@ use Illuminate\Http\Request;
 
 class ComplaintController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $complaints = Complaint::orderBy('created_at', 'desc')->paginate(10);
+        $user = auth()->user();
 
-        return view('complaints.index', [
-            'complaints' => $complaints
+        /**
+         * =====================================================
+         * 1. Reset filter when user clicks "Reset"
+         * =====================================================
+         */
+        if ($request->reset == 1) {
+            session()->forget([
+                'filter_month',
+                'filter_year',
+                'filter_departmentplant',
+                'filter_status',
+                'filter_sort',
+                'filter_direction',
+            ]);
+
+            return redirect()->route('complaints.index');
+        }
+
+        /**
+         * =====================================================
+         * 2. Handle Filters (smart handling for "" / null)
+         * =====================================================
+         */
+
+        // MONTH
+        if ($request->has('month')) {
+            if ($request->month === null || $request->month === '') {
+                session()->forget('filter_month');
+                $month = null;
+            } else {
+                session(['filter_month' => $request->month]);
+                $month = $request->month;
+            }
+        } else {
+            $month = session('filter_month');
+        }
+
+        // YEAR
+        if ($request->has('year')) {
+            if ($request->year === null || $request->year === '') {
+                session()->forget('filter_year');
+                $year = null;
+            } else {
+                session(['filter_year' => $request->year]);
+                $year = $request->year;
+            }
+        } else {
+            $year = session('filter_year');
+        }
+
+        // DEPARTMENT
+        if ($request->has('departmentplant')) {
+            if ($request->departmentplant === null || $request->departmentplant === '') {
+                session()->forget('filter_departmentplant');
+                $filterDept = null;
+            } else {
+                session(['filter_departmentplant' => $request->departmentplant]);
+                $filterDept = $request->departmentplant;
+            }
+        } else {
+            $filterDept = session('filter_departmentplant');
+        }
+
+        // STATUS
+        if ($request->has('status')) {
+            if ($request->status === null || $request->status === '') {
+                session()->forget('filter_status');
+                $status = null;
+            } else {
+                session(['filter_status' => $request->status]);
+                $status = $request->status;
+            }
+        } else {
+            $status = session('filter_status');
+        }
+
+        // SORT & DIRECTION
+        $sort = $request->sort ?? session('filter_sort', 'created_at');
+        $direction = $request->direction ?? session('filter_direction', 'desc');
+
+        session([
+            'filter_sort'      => $sort,
+            'filter_direction' => $direction,
         ]);
+
+        /**
+         * =====================================================
+         * 3. Build Query
+         * =====================================================
+         */
+        $departmentPlants = DepartmentPlant::with('department')->get();
+        $departmentName = null;
+
+        $query = Complaint::query();
+
+        // ADMIN → only see complaints from their department
+        if ($user->hasRole('Admin')) {
+            $departmentName = $user->department->department->department ?? null;
+
+            if ($departmentName) {
+                $query->whereHas('root_causes', function ($q) use ($departmentName) {
+                    $q->where('root_cause_name', $departmentName);
+                });
+            } else {
+                $query->whereRaw('1 = 0'); // No department → no data
+            }
+        }
+
+        // SUPERADMIN → filter by selected department
+        if ($user->hasRole('Superadmin') && $filterDept) {
+            $query->whereHas('root_causes', function ($q) use ($filterDept) {
+                $q->where('root_cause_name', $filterDept);
+            });
+        }
+
+        // APPLY FILTERS
+        if ($month) {
+            $query->whereMonth('date', $month);
+        }
+
+        if ($year) {
+            $query->whereYear('date', $year);
+        }
+
+        if ($status !== null && $status !== '') {
+            $query->where('status', $status);
+        }
+
+        // SORTING
+        $query->orderBy($sort, $direction);
+
+        /**
+         * =====================================================
+         * 4. Pagination (keep query string)
+         * =====================================================
+         */
+        $complaints = $query->paginate(10)->appends(request()->query());
+
+        /**
+         * =====================================================
+         * 5. Summary Count
+         * =====================================================
+         */
+        $total_complaints = Complaint::query()
+            ->when($user->hasRole('Admin'), function ($q) use ($departmentName) {
+                if ($departmentName) {
+                    $q->whereHas('root_causes', function ($qa) use ($departmentName) {
+                        $qa->where('root_cause_name', $departmentName);
+                    });
+                } else {
+                    $q->whereRaw('1 = 0');
+                }
+            })
+            ->when(
+                $user->hasRole('Superadmin') && $filterDept,
+                fn($q) => $q->whereHas('root_causes', fn($qa) => $qa->where('root_cause_name', $filterDept))
+            )
+            ->when($month, fn($q) => $q->whereMonth('date', $month))
+            ->when($year, fn($q) => $q->whereYear('date', $year))
+            ->when($status !== null && $status !== '', fn($q) => $q->where('status', $status))
+            ->count();
+
+        /**
+         * =====================================================
+         * 6. Return View
+         * =====================================================
+         */
+        return view('complaints.index', compact(
+            'complaints',
+            'departmentPlants',
+            'filterDept',
+            'total_complaints',
+            'month',
+            'year',
+            'status',
+            'sort',
+            'direction'
+        ));
     }
 
     public function create()
@@ -262,6 +438,26 @@ class ComplaintController extends Controller
         return view('complaints.update', compact('complaint', 'plants', 'departments'));
     }
 
+    public function insertCorrectiveAction(Request $request, $uuid)
+    {
+        $complaint = Complaint::firstWhere('uuid', $uuid);
+
+        CorrectiveAction::updateOrCreate(
+            ['complaint_uuid' => $complaint->uuid], // ← find by this
+            [
+                'short_term_ca' => $request->short_term_ca ?? null,
+                'long_term_ca' => $request->long_term_ca ?? null,
+                'causative_factor' => $request->causative_factor ?? null,
+            ]
+        );
+
+        $complaint->status = 1;
+        $complaint->notes = NULL;
+        $complaint->save();
+
+        return redirect()->route('complaints.index')->with('success', 'Data komplain berhasil disimpan.');
+    }
+
     public function updateStatus(Request $request, $uuid)
     {
         $complaint = Complaint::where('uuid', $uuid)->firstOrFail();
@@ -271,4 +467,28 @@ class ComplaintController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function complaintApprove($uuid)
+    {
+        $complaint = Complaint::where('uuid', $uuid)->firstOrFail();
+        $complaint->status = '2';
+        $complaint->save();
+
+        return redirect()->route('complaints.index')->with('success', 'Data komplain berhasil diupdate.');
+    }
+
+    public function complaintReject(Request $request, $uuid)
+    {
+        $request->validate([
+            'reject_note' => 'required|string'
+        ]);
+
+        $complaint = Complaint::where('uuid', $uuid)->firstOrFail();
+
+        $complaint->update([
+            'status' => '3',
+            'reject_note' => $request->reject_note,
+        ]);
+
+        return redirect()->back()->with('success', 'Complaint berhasil ditolak');
+    }
 }

@@ -11,7 +11,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Username *</label>
-                <input type="text" id="userUsername"
+                <input type="text" id="userUsername" name="username"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required>
                 <p class="text-xs text-gray-500 mt-1">Username harus unik dan tidak boleh sama</p>
@@ -19,17 +19,17 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap *</label>
-                <input type="text" id="userFullName"
+                <input type="text" id="userFullName" name="name"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
                 <div class="relative">
-                    <input type="password" id="userPassword"
+                    <input type="password" id="userPassword" name="password"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-12"
                         required>
                     <button type="button" onclick="toggleUserPassword()"
@@ -49,28 +49,36 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Role *</label>
-                <select id="userRole"
+                <select id="userRole" name="user_role"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required>
-                    <option value="">Pilih Role</option>
-                    <option value="Top Manager">Top Manager - Akses penuh sistem</option>
-                    <option value="Manager QC">Manager QC - Manajemen Quality Control</option>
-                    <option value="Manager Departemen">Manager Departemen - Manajemen departemen</option>
-                    <option value="Admin QC">Admin QC - Admin Quality Control</option>
-                    <option value="Admin Departemen - Breadcrumb">Admin Departemen - Breadcrumb</option>
-                    <option value="Admin Departemen - Warehouse & Logistik">Admin Departemen - Warehouse & Logistik
+                    <option value="">-- Pilih Role --</option>
+                    @foreach($roles as $role)
+                    <option value="{{ $role->name }}" {{ old('user_role') == $role->name ? 'selected' : '' }}>
+                        {{ $role->name }}
                     </option>
-                    <option value="Admin Departemen - Further">Admin Departemen - Further</option>
-                    <option value="Admin Departemen - Slaughterhouse">Admin Departemen - Slaughterhouse</option>
-                    <option value="Admin Departemen - Sausage">Admin Departemen - Sausage</option>
-                    <option value="Admin Departemen - Premix">Admin Departemen - Premix</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Departemen</label>
+                <select id="department" name="department"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required>
+                    <option value="">-- Pilih Departemen --</option>
+                    @foreach($departments as $department)
+                    <option value="{{ $department->uuid }}" {{ old('department') == $department->uuid ? 'selected' : '' }}>
+                        {{ $department->department }}
+                    </option>
+                    @endforeach
                 </select>
             </div>
         </div>
 
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input type="email" id="userEmail"
+            <input type="email" id="userEmail" name="email"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <p class="text-xs text-gray-500 mt-1">Opsional - untuk notifikasi sistem</p>
         </div>
@@ -80,57 +88,71 @@
             <div class="border border-gray-300 rounded-lg p-3 max-h-40 overflow-y-auto">
                 <div class="space-y-2">
                     <label class="flex items-center space-x-2">
-                        <input type="checkbox" id="userBranchAll" onchange="handleUserBranchSelection('all')"
+                        <input type="checkbox" id="userBranchAll"
                             class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                         <span class="text-sm font-medium text-gray-700">Semua Cabang</span>
                     </label>
+
                     <div class="border-t border-gray-200 pt-2">
                         <div class="grid grid-cols-1 gap-2" id="userBranchCheckboxes">
+                            @foreach($plants as $plant)
                             <label class="flex items-center space-x-2">
-                                <input type="checkbox" value="salatiga" name="userBranches"
-                                    onchange="handleUserBranchSelection('salatiga')"
-                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span class="text-sm">Salatiga</span>
+                                <input type="checkbox" value="{{ $plant->uuid }}"
+                                    name="userBranches[]"
+                                    class="userBranch rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm">{{ $plant->plant }}</span>
                             </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" value="sragen" name="userBranches"
-                                    onchange="handleUserBranchSelection('sragen')"
-                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span class="text-sm">Sragen</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" value="banyumas" name="userBranches"
-                                    onchange="handleUserBranchSelection('banyumas')"
-                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span class="text-sm">Banyumas</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" value="pemalang" name="userBranches"
-                                    onchange="handleUserBranchSelection('pemalang')"
-                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span class="text-sm">Pemalang</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" value="kebumen" name="userBranches"
-                                    onchange="handleUserBranchSelection('kebumen')"
-                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span class="text-sm">Kebumen</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" value="banjarbaru" name="userBranches"
-                                    onchange="handleUserBranchSelection('banjarbaru')"
-                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span class="text-sm">Banjarbaru</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" value="balikpapan" name="userBranches"
-                                    onchange="handleUserBranchSelection('balikpapan')"
-                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span class="text-sm">Balikpapan</span>
-                            </label>
+                            @endforeach
                         </div>
                     </div>
                 </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const allCheckbox = document.getElementById('userBranchAll');
+                        const branchContainer = document.getElementById('userBranchCheckboxes');
+
+                        // Live list of branch checkboxes (in case you add/remove dynamically)
+                        function getBranchCheckboxes() {
+                            return branchContainer.querySelectorAll('.userBranch');
+                        }
+
+                        // When "Semua Cabang" toggles -> toggle all branch checkboxes
+                        allCheckbox.addEventListener('change', function() {
+                            const checked = allCheckbox.checked;
+                            getBranchCheckboxes().forEach(cb => cb.checked = checked);
+                        });
+
+                        // When any individual branch toggles -> update the "Semua Cabang" checked state
+                        // Attach listeners to existing checkboxes now
+                        function bindBranchListeners() {
+                            getBranchCheckboxes().forEach(cb => {
+                                // avoid binding multiple times if this function runs again
+                                cb.removeEventListener('change', onSingleBranchChange);
+                                cb.addEventListener('change', onSingleBranchChange);
+                            });
+                        }
+
+                        function onSingleBranchChange() {
+                            const branchList = Array.from(getBranchCheckboxes());
+                            const allChecked = branchList.length > 0 && branchList.every(cb => cb.checked);
+                            allCheckbox.checked = allChecked;
+                        }
+
+                        // initial bind
+                        bindBranchListeners();
+
+                        // If branch checkboxes may be added later dynamically, observe the container
+                        // (optional, keeps "Semua Cabang" behavior correct for dynamic changes)
+                        const observer = new MutationObserver(() => {
+                            bindBranchListeners();
+                        });
+                        observer.observe(branchContainer, {
+                            childList: true,
+                            subtree: true
+                        });
+                    });
+                </script>
             </div>
             <p class="text-xs text-gray-500 mt-1">Pilih cabang yang dapat diakses user (dapat lebih dari satu)</p>
         </div>
@@ -139,12 +161,12 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
             <div class="flex items-center space-x-4">
                 <label class="flex items-center">
-                    <input type="radio" name="userStatus" value="active" class="text-blue-600 focus:ring-blue-500"
+                    <input type="radio" name="userStatus" value="1" class="text-blue-600 focus:ring-blue-500"
                         checked>
                     <span class="ml-2 text-sm text-gray-700">Aktif</span>
                 </label>
                 <label class="flex items-center">
-                    <input type="radio" name="userStatus" value="inactive" class="text-blue-600 focus:ring-blue-500">
+                    <input type="radio" name="userStatus" value="0" class="text-blue-600 focus:ring-blue-500">
                     <span class="ml-2 text-sm text-gray-700">Tidak Aktif</span>
                 </label>
             </div>
@@ -178,22 +200,22 @@
 
 @section('script')
 <script>
-function toggleUserPassword() {
-    const passwordInput = document.getElementById('userPassword');
-    const eyeIcon = document.getElementById('userEyeIcon');
+    function toggleUserPassword() {
+        const passwordInput = document.getElementById('userPassword');
+        const eyeIcon = document.getElementById('userEyeIcon');
 
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        eyeIcon.innerHTML = `
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.innerHTML = `
 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
                 `;
-    } else {
-        passwordInput.type = 'password';
-        eyeIcon.innerHTML = `
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.innerHTML = `
 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                 `;
+        }
     }
-}
 </script>
 @endsection

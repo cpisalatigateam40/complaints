@@ -38,10 +38,16 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'can create plants']);
         Permission::create(['name' => 'can edit plants']);
         Permission::create(['name' => 'can delete plants']);
+        Permission::create(['name' => 'can update status']);
+        Permission::create(['name' => 'can update data']);
+        Permission::create(['name' => 'can delete data']);
+        Permission::create(['name' => 'can add data']);
+        Permission::create(['name' => 'can edit data']);
 
         $roleSuperadmin = Role::create(['name' => 'Superadmin']);
         $roleAdmin = Role::create(['name' => 'Admin']);
         $roleUser = Role::create(['name' => 'User']);
+        $roleQC = Role::create(['name' => 'QC']);
         $roleSuperadmin->givePermissionTo(Permission::all());
     }
 }
